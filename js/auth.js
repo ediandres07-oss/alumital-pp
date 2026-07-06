@@ -220,7 +220,11 @@
   function switchLoginVideo(videoId, btn) {
     const iframe = document.getElementById('login-video-iframe');
     if (iframe) {
-      iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&loop=1&playlist=' + videoId + '&controls=0&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1';
+      const origin = window.location.origin;
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + 
+                   '?autoplay=1&mute=1&loop=1&playlist=' + videoId + 
+                   '&controls=0&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1' + 
+                   '&origin=' + encodeURIComponent(origin);
     }
     
     // Update active class on switcher buttons
@@ -238,6 +242,17 @@
   // ========================
   document.addEventListener('DOMContentLoaded', function () {
     verificarSesion();
+    
+    // Inicializar el video de fondo del login con el origin correcto para evitar bloqueos
+    const iframe = document.getElementById('login-video-iframe');
+    if (iframe) {
+      const videoId = 'kY0R3xP2mQ0';
+      const origin = window.location.origin;
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + 
+                   '?autoplay=1&mute=1&loop=1&playlist=' + videoId + 
+                   '&controls=0&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1' + 
+                   '&origin=' + encodeURIComponent(origin);
+    }
   });
 
   // ========================
