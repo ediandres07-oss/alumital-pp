@@ -11,22 +11,21 @@
 
   <!-- LOGIN SCREEN -->
   <div id="login-screen" class="login-screen">
-    <!-- Video de fondo interactivo (YouTube loop) -->
+    <!-- Video de fondo interactivo (HTML5 Video) -->
     <div class="video-bg-container">
-      <iframe id="login-video-iframe" 
-        src="https://www.youtube-nocookie.com/embed/kY0R3xP2mQ0?autoplay=1&mute=1&loop=1&playlist=kY0R3xP2mQ0&controls=0&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1" 
-        frameborder="0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen>
-      </iframe>
+      <video id="login-video" autoplay muted loop playsinline>
+        <source id="login-video-source" 
+          src="https://assets.mixkit.co/videos/preview/mixkit-machinery-in-a-heavy-industrial-factory-41804-large.mp4" 
+          type="video/mp4">
+      </video>
       <div class="video-bg-overlay"></div>
     </div>
 
     <!-- Switcher de videos interactivo -->
     <div class="video-switcher no-print">
-      <button class="switcher-btn active" onclick="switchLoginVideo('kY0R3xP2mQ0', this)">🏭 Fábrica</button>
-      <button class="switcher-btn" onclick="switchLoginVideo('R2kE1L28D1s', this)">🛠️ Ensamble</button>
-      <button class="switcher-btn" onclick="switchLoginVideo('R9dF4t4T-eQ', this)">⚙️ Corte CNC</button>
+      <button class="switcher-btn active" onclick="switchLoginVideo('https://assets.mixkit.co/videos/preview/mixkit-machinery-in-a-heavy-industrial-factory-41804-large.mp4', this)">🏭 Fábrica</button>
+      <button class="switcher-btn" onclick="switchLoginVideo('https://assets.mixkit.co/videos/preview/mixkit-worker-welding-metal-in-a-workshop-41793-large.mp4', this)">🛠️ Ensamble</button>
+      <button class="switcher-btn" onclick="switchLoginVideo('https://assets.mixkit.co/videos/preview/mixkit-industrial-robotic-arm-welding-metal-41785-large.mp4', this)">⚙️ Corte CNC</button>
     </div>
 
     <div class="login-card">
