@@ -11,6 +11,27 @@
 
   <!-- LOGIN SCREEN -->
   <div id="login-screen" class="login-screen">
+    <!-- Video de fondo interactivo (YouTube loop) -->
+    <div class="video-bg-container">
+      <iframe id="login-video-iframe" 
+        src="https://www.youtube.com/embed/kY0R3xP2mQ0?autoplay=1&mute=1&loop=1&playlist=kY0R3xP2mQ0&controls=0&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1" 
+        frameborder="0" 
+        allow="autoplay; encrypted-media" 
+        allowfullscreen>
+      </iframe>
+      <div class="video-bg-overlay"></div>
+    </div>
+
+    <!-- Switcher de videos interactivo -->
+    <div class="video-switcher no-print">
+      <div style="font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding-left: 6px; margin-bottom: 4px;">Videos de Carpintería</div>
+      <div style="display: flex; gap: 6px;">
+        <button class="switcher-btn active" onclick="switchLoginVideo('kY0R3xP2mQ0', this)">🏭 Fábrica</button>
+        <button class="switcher-btn" onclick="switchLoginVideo('R2kE1L28D1s', this)">🛠️ Ensamble</button>
+        <button class="switcher-btn" onclick="switchLoginVideo('R9dF4t4T-eQ', this)">⚙️ Corte CNC</button>
+      </div>
+    </div>
+
     <div class="login-card">
       <div class="login-logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px;color:#0022cc;">

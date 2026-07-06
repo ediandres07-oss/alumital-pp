@@ -212,6 +212,27 @@
     }
   }
 
+  /**
+   * Switches the YouTube video playing in the login screen background.
+   * @param {string} videoId - YouTube Video ID
+   * @param {HTMLElement} btn - Button element that was clicked
+   */
+  function switchLoginVideo(videoId, btn) {
+    const iframe = document.getElementById('login-video-iframe');
+    if (iframe) {
+      iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&loop=1&playlist=' + videoId + '&controls=0&showinfo=0&rel=0&iv_load_policy=3&enablejsapi=1';
+    }
+    
+    // Update active class on switcher buttons
+    const buttons = document.querySelectorAll('.switcher-btn');
+    buttons.forEach(function (b) {
+      b.classList.remove('active');
+    });
+    if (btn) {
+      btn.classList.add('active');
+    }
+  }
+
   // ========================
   // Initialize on page load
   // ========================
@@ -226,5 +247,6 @@
   window.cerrarSesion = cerrarSesion;
   window.verificarSesion = verificarSesion;
   window.getAuthHeader = getAuthHeader;
+  window.switchLoginVideo = switchLoginVideo;
 
 })();
