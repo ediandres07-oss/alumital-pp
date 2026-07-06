@@ -923,3 +923,309 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
+/* ============================================
+   LOGIN SCREEN
+   ============================================ */
+.login-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0022cc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-card .form-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.login-card .form-input:focus {
+  border-color: #0022cc;
+  box-shadow: 0 0 12px rgba(0, 34, 204, 0.2);
+}
+
+#btn-login {
+  background: #0022cc !important;
+  transition: all 0.25s ease;
+}
+
+#btn-login:hover {
+  background: #001a99 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 34, 204, 0.4);
+}
+
+#btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#login-error {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+/* ============================================
+   HAMBURGER BUTTON & MOBILE SIDEBAR
+   ============================================ */
+.hamburger-btn {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 1100;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hamburger-btn svg {
+  width: 24px;
+  height: 24px;
+  color: var(--text-primary);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: none;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 16px;
+    padding-top: 56px;
+  }
+
+  .content-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .configurator-layout,
+  .optimizer-layout,
+  .ai-panel-layout,
+  .budget-summary-panel {
+    grid-template-columns: 1fr !important;
+  }
+
+  #panel-clientes > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .table-responsive,
+  .data-table {
+    font-size: 12px;
+  }
+
+  .glass-panel {
+    padding: 16px;
+  }
+
+  .budget-config {
+    grid-template-columns: 1fr !important;
+  }
+
+  .btn {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .login-card {
+    margin: 16px;
+    padding: 32px 24px;
+  }
+
+  .tab-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start !important;
+  }
+
+  .tab-header > div:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 10px;
+    padding-top: 52px;
+  }
+
+  .content-title h2 {
+    font-size: 20px;
+  }
+
+  .glass-panel {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .login-card {
+    padding: 28px 20px;
+    border-radius: 14px;
+  }
+}
+
+/* ============================================
+   CLIENTES & HISTORIAL PANELS
+   ============================================ */
+
+/* Data table (shared by clientes and historial) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th {
+  padding: 12px 10px;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.data-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(0, 34, 204, 0.03);
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.data-table tbody tr:nth-child(even):hover {
+  background: rgba(0, 34, 204, 0.05);
+}
+
+/* Estado badges */
+.estado-badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: capitalize;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* Historial action buttons */
+#historial-tabla-body .btn {
+  padding: 5px 8px;
+  font-size: 11px;
+}
+
+/* Client form on the clientes panel */
+#panel-clientes .form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   USER MENU & HEADER IMPROVEMENTS
+   ============================================ */
+.sidebar-user {
+  padding: 16px 12px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 12px;
+}
+
+.sidebar-user #btn-logout {
+  transition: all 0.2s ease;
+}
+
+.sidebar-user #btn-logout:hover {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: var(--danger);
+}
+
+/* Print: hide new elements */
+@media print {
+  .login-screen,
+  .hamburger-btn,
+  .sidebar-overlay,
+  .sidebar-user,
+  #panel-clientes,
+  #panel-historial {
+    display: none !important;
+  }
+}
+

@@ -1,0 +1,5 @@
+alumital.db
+alumital.db-shm
+alumital.db-wal
+__pycache__/
+*.pyc

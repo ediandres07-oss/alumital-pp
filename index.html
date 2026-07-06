@@ -5,11 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alumital SAS - Asistente de Carpintería de Aluminio</title>
   <meta name="description" content="Calculadora de cortes, descuento de vidrios, presupuestador y optimizador de corte 1D para carpintería de aluminio. Integrado con Claude Skills.">
-  <link rel="stylesheet" href="css/styles.css?v=2.2.1">
+  <link rel="stylesheet" href="css/styles.css?v=3.0.0">
 </head>
 <body>
 
-  <div class="app-container">
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px;color:#0022cc;">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M9 3v18" /><path d="M15 3v18" />
+          <path d="M3 9h18" /><path d="M3 15h18" />
+        </svg>
+        <h1 style="font-size:28px;color:#0022cc;margin-top:12px;">Alumital SAS</h1>
+        <p style="color:#64748b;margin-top:4px;">Asistente de Carpintería de Aluminio</p>
+      </div>
+      <form id="login-form" onsubmit="event.preventDefault(); iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-password').value);">
+        <div class="form-group" style="margin-bottom:16px;">
+          <label for="login-email" style="font-weight:600;margin-bottom:6px;display:block;">Usuario</label>
+          <input type="text" id="login-email" class="form-input" placeholder="admin" required autofocus style="font-size:16px;padding:12px;">
+        </div>
+        <div class="form-group" style="margin-bottom:20px;">
+          <label for="login-password" style="font-weight:600;margin-bottom:6px;display:block;">Contraseña</label>
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required style="font-size:16px;padding:12px;">
+        </div>
+        <div id="login-error" style="color:#dc2626;font-size:14px;margin-bottom:12px;display:none;"></div>
+        <button type="submit" id="btn-login" class="btn btn-primary" style="width:100%;padding:14px;font-size:16px;font-weight:700;background:#0022cc;border:none;border-radius:10px;color:white;cursor:pointer;">
+          Iniciar Sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- HAMBURGER BUTTON (Mobile) -->
+  <button id="hamburger-btn" class="hamburger-btn no-print" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('active');">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('active');"></div>
+
+  <div class="app-container" id="app-main" style="display:none;">
     
     <!-- SIDEBAR -->
     <aside class="sidebar no-print">
@@ -113,12 +148,46 @@
               <span>Claude Skill</span>
             </a>
           </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="clientes" id="menu-clientes">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <span>Clientes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="historial" id="menu-historial">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>Historial</span>
+            </a>
+          </li>
         </ul>
       </nav>
 
       <div class="sidebar-footer">
-        <div class="version-info">Alumital SAS v1.0.0</div>
+        <div class="version-info">Alumital SAS v3.0.0</div>
         <div class="version-info" style="color: var(--accent-blue);">Listo para Claude</div>
+      </div>
+
+      <!-- User Info -->
+      <div class="sidebar-user no-print">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#0022cc;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;" id="user-avatar">A</div>
+          <div>
+            <div id="user-display-name" style="font-weight:600;font-size:13px;color:var(--text-primary);">Admin</div>
+            <div id="user-display-rol" style="font-size:11px;color:var(--text-muted);">Administrador</div>
+          </div>
+        </div>
+        <button id="btn-logout" onclick="cerrarSesion()" style="background:none;border:1px solid var(--border-color);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:11px;color:var(--text-muted);margin-top:8px;width:100%;">
+          Cerrar Sesión
+        </button>
       </div>
     </aside>
 
@@ -944,6 +1013,105 @@
         </div>
       </section>
 
+        <!-- ===================== PANEL: CLIENTES ===================== -->
+        <div class="panel-tab" id="panel-clientes">
+          <h2 style="margin-bottom: 24px; font-size: 22px; font-weight: 700;">Gestión de Clientes</h2>
+          
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;">
+            <!-- Formulario -->
+            <div class="glass-panel">
+              <h3 style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <span id="cli-form-title">Nuevo Cliente</span>
+              </h3>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="form-group">
+                  <label for="cli-nombre">Nombre / Razón Social *</label>
+                  <input type="text" id="cli-nombre" class="form-input" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                  <label for="cli-nit">NIT / Cédula</label>
+                  <input type="text" id="cli-nit" class="form-input" placeholder="Ej: 900123456-7">
+                </div>
+                <div class="form-group">
+                  <label for="cli-telefono">Teléfono</label>
+                  <input type="text" id="cli-telefono" class="form-input" placeholder="Ej: 3001234567">
+                </div>
+                <div class="form-group">
+                  <label for="cli-email">Email</label>
+                  <input type="email" id="cli-email" class="form-input" placeholder="Ej: juan@correo.com">
+                </div>
+                <div class="form-group">
+                  <label for="cli-direccion">Dirección</label>
+                  <input type="text" id="cli-direccion" class="form-input" placeholder="Ej: Cra 45 #32-10, Medellín">
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-primary" onclick="guardarCliente()" style="flex:1;background:#0022cc;">💾 Guardar</button>
+                  <button class="btn" onclick="limpiarFormCliente()" style="flex:1;background:var(--bg-secondary);">🧹 Limpiar</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="glass-panel">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3>Directorio de Clientes</h3>
+                <input type="text" id="cli-buscar" class="form-input" placeholder="🔍 Buscar..." oninput="cargarClientes(this.value)" style="max-width:250px;">
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Nombre</th><th>NIT</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr>
+                  </thead>
+                  <tbody id="clientes-tabla-body">
+                    <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px;">No hay clientes registrados.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== PANEL: HISTORIAL ===================== -->
+        <div class="panel-tab" id="panel-historial">
+          <h2 style="margin-bottom: 24px; font-size: 22px; font-weight: 700;">Historial de Cotizaciones</h2>
+
+          <!-- Barra de acciones -->
+          <div class="glass-panel" style="margin-bottom:20px;">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+              <div class="form-group" style="flex:1;min-width:180px;">
+                <label for="cot-cliente-select">Cliente</label>
+                <select id="cot-cliente-select" class="form-input"><option value="">— Todos —</option></select>
+              </div>
+              <div class="form-group" style="flex:1;min-width:150px;">
+                <label for="filtro-estado">Estado</label>
+                <select id="filtro-estado" class="form-input">
+                  <option value="">— Todos —</option>
+                  <option value="borrador">Borrador</option>
+                  <option value="enviada">Enviada</option>
+                  <option value="aprobada">Aprobada</option>
+                  <option value="rechazada">Rechazada</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="cargarHistorial({cliente_id: document.getElementById('cot-cliente-select').value, estado: document.getElementById('filtro-estado').value})" style="background:#0022cc;height:42px;">🔍 Filtrar</button>
+              <button class="btn btn-primary" onclick="guardarCotizacionActual()" style="background:#16a34a;height:42px;">💾 Guardar Cotización Actual</button>
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="glass-panel">
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr><th>#</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody id="historial-tabla-body">
+                  <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px;">No hay cotizaciones guardadas.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       <!-- Modal para Exportación Siigo API -->
       <div id="modal-siigo" class="modal-overlay no-print" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
         <div class="glass-panel" style="width: 92%; max-width: 640px; background: #ffffff; color: #0f172a; padding: 28px; display: flex; flex-direction: column; gap: 16px; border: 1px solid #cbd5e1; box-shadow: 0 24px 48px rgba(0,0,0,0.18); border-radius: 14px; max-height: 90vh; overflow-y: auto;">
@@ -1049,12 +1217,15 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/calculator.js?v=2.5.3"></script>
-  <script src="js/optimizer.js?v=2.5.3"></script>
-  <script src="js/budget.js?v=2.5.3"></script>
-  <script src="js/inventory.js?v=2.5.3"></script>
-  <script src="js/invoice.js?v=2.5.3"></script>
-  <script src="js/production.js?v=2.5.3"></script>
-  <script src="js/app.js?v=2.5.3"></script>
+  <script src="js/calculator.js?v=3.0.0"></script>
+  <script src="js/optimizer.js?v=3.0.0"></script>
+  <script src="js/budget.js?v=3.0.0"></script>
+  <script src="js/inventory.js?v=3.0.0"></script>
+  <script src="js/invoice.js?v=3.0.0"></script>
+  <script src="js/production.js?v=3.0.0"></script>
+  <script src="js/auth.js?v=3.0.0"></script>
+  <script src="js/clientes.js?v=3.0.0"></script>
+  <script src="js/historial.js?v=3.0.0"></script>
+  <script src="js/app.js?v=3.0.0"></script>
 </body>
 </html>
