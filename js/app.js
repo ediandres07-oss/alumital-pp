@@ -92,6 +92,11 @@ function initNavigation() {
         if (typeof renderizarFacturaPreview === 'function') renderizarFacturaPreview();
       } else if (targetTab === 'produccion') {
         if (typeof renderizarDespiece === 'function') renderizarDespiece();
+      } else if (targetTab === 'clientes') {
+        if (typeof cargarClientes === 'function') cargarClientes();
+      } else if (targetTab === 'historial') {
+        if (typeof cargarHistorial === 'function') cargarHistorial();
+        if (typeof cargarClientesDropdown === 'function') cargarClientesDropdown();
       }
     });
   });
