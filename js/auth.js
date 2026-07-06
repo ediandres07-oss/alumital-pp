@@ -243,8 +243,7 @@
    */
   function makeCardDraggable() {
     const card = document.querySelector('.login-card');
-    const logoArea = document.querySelector('.login-logo');
-    if (!card || !logoArea) return;
+    if (!card) return;
 
     let active = false;
     let currentX = 0;
@@ -254,38 +253,54 @@
     let xOffset = 0;
     let yOffset = 0;
 
-    logoArea.style.cursor = 'move';
-    logoArea.style.userSelect = 'none';
+    // Colocar cursor de agarre en toda la tarjeta (excepto elementos interactivos)
+    card.style.cursor = 'grab';
+    card.style.userSelect = 'none';
+
+    // Asegurar que inputs y botones tengan cursores normales
+    const interactives = card.querySelectorAll('input, button, label');
+    interactives.forEach(el => {
+      el.style.cursor = 'default';
+      if (el.tagName.toLowerCase() === 'input') el.style.cursor = 'text';
+      if (el.tagName.toLowerCase() === 'button') el.style.cursor = 'pointer';
+    });
 
     // Eventos Mouse
-    logoArea.addEventListener('mousedown', dragStart, false);
+    card.addEventListener('mousedown', dragStart, false);
     document.addEventListener('mouseup', dragEnd, false);
     document.addEventListener('mousemove', drag, false);
 
     // Eventos Táctiles (Celular)
-    logoArea.addEventListener('touchstart', dragStart, { passive: true });
+    card.addEventListener('touchstart', dragStart, { passive: true });
     document.addEventListener('touchend', dragEnd, { passive: true });
     document.addEventListener('touchmove', drag, { passive: false });
 
     function dragStart(e) {
+      // Si hacen click en inputs, botón o etiquetas, no arrastramos
+      const targetTag = e.target.tagName.toLowerCase();
+      if (targetTag === 'input' || targetTag === 'button' || targetTag === 'label' || e.target.closest('button') || e.target.closest('input')) {
+        return;
+      }
+
+      card.style.cursor = 'grabbing';
+
       if (e.type === 'touchstart') {
         initialX = e.touches[0].clientX - xOffset;
         initialY = e.touches[0].clientY - yOffset;
       } else {
-        e.preventDefault(); // Evitar arrastre nativo de imágenes del navegador
+        e.preventDefault(); // Evitar comportamientos extraños del navegador
         initialX = e.clientX - xOffset;
         initialY = e.clientY - yOffset;
       }
 
-      if (e.target === logoArea || logoArea.contains(e.target)) {
-        active = true;
-      }
+      active = true;
     }
 
     function dragEnd() {
       initialX = currentX;
       initialY = currentY;
       active = false;
+      card.style.cursor = 'grab';
     }
 
     function drag(e) {
