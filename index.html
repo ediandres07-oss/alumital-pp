@@ -29,14 +29,8 @@
     </div>
 
     <div class="login-card">
-      <div class="login-logo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;color:#0022cc;">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <path d="M9 3v18" /><path d="M15 3v18" />
-          <path d="M3 9h18" /><path d="M3 15h18" />
-        </svg>
-        <h1 style="font-size:22px;color:#0022cc;margin-top:8px;">Alumital SAS</h1>
-        <p style="color:#64748b;font-size:12px;margin-top:2px;">Asistente de Carpintería de Aluminio</p>
+      <div class="login-logo" style="margin-bottom: 24px; text-align: center;">
+        <img src="img/logo.jpg" alt="Alumital SAS Logo" style="max-width: 240px; width: 100%; height: auto; border-radius: 6px;">
       </div>
       <form id="login-form" onsubmit="event.preventDefault(); iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-password').value);">
         <div class="form-group" style="margin-bottom:12px;">
@@ -65,16 +59,8 @@
     
     <!-- SIDEBAR -->
     <aside class="sidebar no-print">
-      <div class="logo-container">
-        <!-- SVG Icono Perfil de Aluminio -->
-        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <path d="M9 3v18" />
-          <path d="M15 3v18" />
-          <path d="M3 9h18" />
-          <path d="M3 15h18" />
-        </svg>
-        <span class="logo-text">Alumital SAS</span>
+      <div class="logo-container" style="padding: 12px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.05);">
+        <img src="img/logo.jpg" alt="Alumital SAS Logo" style="max-width: 100%; height: auto; max-height: 44px; border-radius: 4px;">
       </div>
 
       <nav style="flex-grow: 1;">
