@@ -238,11 +238,80 @@
     }
   }
 
+  /**
+   * Habilita arrastrar la tarjeta de login con el cursor y pantallas táctiles desde la zona del logo.
+   */
+  function makeCardDraggable() {
+    const card = document.querySelector('.login-card');
+    const logoArea = document.querySelector('.login-logo');
+    if (!card || !logoArea) return;
+
+    let active = false;
+    let currentX = 0;
+    let currentY = 0;
+    let initialX = 0;
+    let initialY = 0;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    logoArea.style.cursor = 'move';
+    logoArea.style.userSelect = 'none';
+
+    // Eventos Mouse
+    logoArea.addEventListener('mousedown', dragStart, false);
+    document.addEventListener('mouseup', dragEnd, false);
+    document.addEventListener('mousemove', drag, false);
+
+    // Eventos Táctiles (Celular)
+    logoArea.addEventListener('touchstart', dragStart, { passive: true });
+    document.addEventListener('touchend', dragEnd, { passive: true });
+    document.addEventListener('touchmove', drag, { passive: false });
+
+    function dragStart(e) {
+      if (e.type === 'touchstart') {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+      } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+      }
+
+      if (e.target === logoArea || logoArea.contains(e.target)) {
+        active = true;
+      }
+    }
+
+    function dragEnd() {
+      initialX = currentX;
+      initialY = currentY;
+      active = false;
+    }
+
+    function drag(e) {
+      if (active) {
+        if (e.type === 'touchmove') {
+          e.preventDefault(); // Evitar scroll en móviles al arrastrar
+          currentX = e.touches[0].clientX - initialX;
+          currentY = e.touches[0].clientY - initialY;
+        } else {
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+        }
+
+        xOffset = currentX;
+        yOffset = currentY;
+
+        card.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      }
+    }
+  }
+
   // ========================
   // Initialize on page load
   // ========================
   document.addEventListener('DOMContentLoaded', function () {
     verificarSesion();
+    makeCardDraggable();
   });
 
   // ========================
