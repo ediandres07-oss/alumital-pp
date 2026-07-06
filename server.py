@@ -326,7 +326,7 @@ class AlumitalHandler(http.server.SimpleHTTPRequestHandler):
         if body is None:
             return self._error_response(400, "JSON inválido")
 
-        email = body.get("email", "").strip()
+        email = body.get("email", "").strip().lower()
         password = body.get("password", "")
 
         if not email or not password:
