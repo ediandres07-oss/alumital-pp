@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumital SAS - Asistente de Carpintería de Aluminio</title>
+  <meta name="description" content="Calculadora de cortes, descuento de vidrios, presupuestador y optimizador de corte 1D para carpintería de aluminio. Integrado con Claude Skills.">
+  <link rel="stylesheet" href="css/styles.css?v=2.2.1">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar no-print">
+      <div class="logo-container">
+        <!-- SVG Icono Perfil de Aluminio -->
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M9 3v18" />
+          <path d="M15 3v18" />
+          <path d="M3 9h18" />
+          <path d="M3 15h18" />
+        </svg>
+        <span class="logo-text">Alumital SAS</span>
+      </div>
+
+      <nav style="flex-grow: 1;">
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#" class="menu-item active" data-tab="configurador" id="menu-configurador">
+              <!-- SVG Configurator Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M9 3v18" />
+                <path d="M3 9h6" />
+                <path d="M3 15h6" />
+              </svg>
+              <span>Configurador</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="optimizador" id="menu-optimizador">
+              <!-- SVG Optimizer Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18" />
+                <path d="M3 12h18" />
+                <path d="M3 18h18" />
+                <path d="M8 6v12" />
+                <path d="M16 6v12" />
+              </svg>
+              <span>Optimizador de Corte</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="presupuesto" id="menu-presupuesto">
+              <!-- SVG Budget Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              <span>Presupuesto</span>
+              <span id="items-count-badge" class="badge" style="background: var(--accent-teal); color: #fff; margin-left: auto; display: none;">0</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="inventario" id="menu-inventario">
+              <!-- SVG Box/Package Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+              <span>Inventario</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="facturacion" id="menu-facturacion">
+              <!-- SVG FileText/Invoice Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              <span>Facturación</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="produccion" id="menu-produccion">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <span>Despiece / Producción</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-item" data-tab="skill" id="menu-skill">
+              <!-- SVG Robot/AI Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M12 2v4" />
+                <path d="M8 5h8" />
+                <path d="M12 11V9" />
+                <circle cx="8" cy="16" r="1" />
+                <circle cx="16" cy="16" r="1" />
+              </svg>
+              <span>Claude Skill</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="version-info">Alumital SAS v1.0.0</div>
+        <div class="version-info" style="color: var(--accent-blue);">Listo para Claude</div>
+      </div>
+    </aside>
+
+    <!-- MAIN MAIN-CONTENT -->
+    <main class="main-content">
+      
+      <!-- TAB: CONFIGURADOR (DISEÑO) -->
+      <section id="tab-configurador" class="panel-tab active">
+        <header class="content-header">
+          <div class="content-title">
+            <h2>Configurador de Ventanas</h2>
+            <p>Diseña aberturas a medida y calcula perfiles y vidrios al instante.</p>
+          </div>
+          <button id="btn-agregar-ventana" class="btn btn-primary">
+            <!-- SVG Plus Icon -->
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Agregar Ventana
+          </button>
+        </header>
+
+        <div class="configurator-layout" style="margin-top: 24px;">
+          
+          <!-- Lado Izquierdo: Parámetros -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 20px;">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Parámetros de Diseño</h3>
+            
+            <div class="form-group">
+              <label for="config-nombre">Identificación de Abertura</label>
+              <input type="text" id="config-nombre" class="form-input" value="Ventana 1" placeholder="Ej. Ventana Dormitorio">
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1.2fr 0.8fr;">
+              <div class="form-group">
+                <label for="config-categoria">Categoría</label>
+                <select id="config-categoria">
+                  <option value="ventana">Ventana</option>
+                  <option value="puerta" selected>Puerta</option>
+                  <option value="cabina_baño">Cabina de Baño</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="config-tipo">Tipología</label>
+                <select id="config-tipo">
+                  <option value="corrediza">Corrediza (2 Hojas)</option>
+                  <option value="corrediza3" selected>Corrediza (3 Hojas)</option>
+                  <option value="corrediza4">Corrediza (4 Hojas)</option>
+                  <option value="abatible">Abatible/Batiente (1 Hoja)</option>
+                  <option value="fijo">Paño Fijo</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="config-cantidad">Cant (Uds)</label>
+                <input type="number" id="config-cantidad" class="form-input" value="1" min="1">
+              </div>
+            </div>
+
+            <!-- Configuración específica de cabinas de baño -->
+            <div class="form-grid" id="form-grid-cabina" style="display: none; grid-template-columns: 1fr;">
+              <div class="form-group">
+                <label for="config-cabina-tipo">Estilo de Cabina</label>
+                <select id="config-cabina-tipo">
+                  <option value="con_perfil" selected>Con Perfil de Aluminio</option>
+                  <option value="solo_vidrio">Solo Vidrio Templado (Templada)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="config-acabado">Acabado del Aluminio</label>
+                <select id="config-acabado">
+                  <option value="plata" selected>Plata Anodizado</option>
+                  <option value="negro">Negro Mate</option>
+                  <option value="blanco">Blanco Pintado</option>
+                  <option value="bronce">Bronce Colonial</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="config-apertura">Apertura: <span id="apertura-val" style="color: var(--accent-blue); font-weight: bold;">0</span>%</label>
+                <input type="range" id="config-apertura" min="0" max="100" value="0" style="width: 100%; cursor: pointer;">
+              </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr;">
+              <div class="form-group">
+                <label for="config-ensamble">Sistema / Línea de Perfil</label>
+                <select id="config-ensamble">
+                  <option value="VC5020_90">Sistema VC5020 - 90° (Junta Recta)</option>
+                  <option value="VP3831_45">Sistema VP3831 - 45° (Inglete)</option>
+                  <option value="PC8025_45">Sistema PC8025 - 45° (Inglete)</option>
+                  <option value="PC8025_90">Sistema PC8025 - 90° (Junta Recta)</option>
+                  <option value="PC7038_45">Sistema PC7038 - 45° (Inglete)</option>
+                  <option value="PC7038_90" selected>Sistema PC7038 - 90° (Junta Recta)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="config-ancho">Ancho Total (W en mm)</label>
+                <input type="number" id="config-ancho" class="form-input" value="1500" min="200" max="6000">
+              </div>
+
+              <div class="form-group">
+                <label for="config-alto">Alto Total (H en mm)</label>
+                <input type="number" id="config-alto" class="form-input" value="1200" min="200" max="6000">
+              </div>
+            </div>
+
+            <!-- Grilla de Resultados Cortados -->
+            <div class="results-grid" style="margin-top: 10px;">
+              
+              <div class="result-card">
+                <div class="result-card-title">
+                  <span>Lista de Corte de Aluminio</span>
+                  <span style="font-size: 11px; color: var(--text-muted);">Corte</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table" id="table-perfiles">
+                    <thead>
+                      <tr>
+                        <th>Cód</th>
+                        <th>Perfil</th>
+                        <th>Cant</th>
+                        <th>Longitud</th>
+                        <th>Ángulo</th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-perfiles-body">
+                      <!-- Cargado dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="result-card">
+                <div class="result-card-title">
+                  <span>Descuento de Vidrios</span>
+                  <span style="font-size: 11px; color: var(--text-muted);">Medida</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table" id="table-vidrios">
+                    <thead>
+                      <tr>
+                        <th>Tipo</th>
+                        <th>Vidrio</th>
+                        <th>Cant</th>
+                        <th>Dimensiones</th>
+                        <th>Área (m²)</th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-vidrios-body">
+                      <!-- Cargado dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Lado Derecho: Renderizado Dinámico SVG -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <div class="visualizer-card">
+              <div style="position: absolute; top: 16px; left: 16px; font-size: 12px; font-weight: bold; color: var(--text-secondary); text-transform: uppercase;">
+                Vista Previa Proporcional (SVG)
+              </div>
+              <div class="visualizer-svg-container">
+                <svg id="window-preview-svg" class="visualizer-svg" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Renderizado dinámico desde app.js -->
+                </svg>
+              </div>
+            </div>
+            
+            <div class="glass-panel" style="padding: 16px;">
+              <h4 style="color: var(--accent-teal); margin-bottom: 6px; font-size: 14px;">ℹ️ Nota Técnica</h4>
+              <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                Los cortes a 45° requieren troqueladoras e ingletadoras calibradas. El descuento de hoja vertical está seteado en 68 mm y la holgura de vidrio en 70 mm sobre la hoja. Puedes personalizar estos valores en los archivos JS o importando plantillas desde Claude.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB: OPTIMIZADOR DE CORTE -->
+      <section id="tab-optimizador" class="panel-tab">
+        <header class="content-header">
+          <div class="content-title">
+            <h2>Optimizador de Corte (1D Stock)</h2>
+            <p>Calcula el acomodo óptimo en barras de 6 metros para minimizar el desperdicio.</p>
+          </div>
+          <button id="btn-ejecutar-optimizacion" class="btn btn-teal">
+            <!-- SVG Play Icon -->
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Optimizar Cortes
+          </button>
+        </header>
+
+        <div class="optimizer-layout" style="margin-top: 24px;">
+          
+          <!-- Entrada del Optimizador (Lista de perfiles a cortar) -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 20px;">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Lista de Cortes Requeridos</h3>
+            
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+              <div class="form-group">
+                <label for="opt-largo-stock">Barra de Stock (mm)</label>
+                <input type="number" id="opt-largo-stock" class="form-input" value="6000">
+              </div>
+              <div class="form-group">
+                <label for="opt-espesor-sierra">Kerf / Sierra (mm)</label>
+                <input type="number" id="opt-espesor-sierra" class="form-input" value="4">
+              </div>
+            </div>
+
+            <!-- Listado dinámico de cortes -->
+            <div id="optimizador-input-list" class="cut-input-list">
+              <!-- Llenado dinámico desde app.js -->
+            </div>
+          </div>
+
+          <!-- Resultados Visuales de Barras -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 20px;">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Diagrama de Distribución de Corte</h3>
+            
+            <!-- Resumen de tarjetas -->
+            <div class="summary-cards">
+              <div class="summary-card accent">
+                <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Barras de 6m</span>
+                <div class="value" id="opt-stat-barras">0</div>
+              </div>
+              <div class="summary-card teal">
+                <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Eficiencia</span>
+                <div class="value" id="opt-stat-eficiencia">0%</div>
+              </div>
+              <div class="summary-card">
+                <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Utilizado</span>
+                <div class="value" id="opt-stat-utilizado">0 m</div>
+              </div>
+              <div class="summary-card">
+                <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Residuos</span>
+                <div class="value" id="opt-stat-desperdicio">0 m</div>
+              </div>
+            </div>
+
+            <!-- Contenedor de las barras -->
+            <div id="opt-barras-visualizador" class="bar-visualizer-container">
+              <p style="text-align: center; color: var(--text-secondary); padding: 40px 0;">
+                Haz clic en "Optimizar Cortes" para ver el plano de corte visual.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB: PRESUPUESTO -->
+      <section id="tab-presupuesto" class="panel-tab">
+        <header class="content-header">
+          <div class="content-title">
+            <h2>Cotización & Presupuesto Detallado</h2>
+            <p>Calcula costos de materiales, accesorios, mano de obra e imprime el reporte final.</p>
+          </div>
+          <button id="btn-imprimir-presupuesto" class="btn btn-secondary">
+            <!-- SVG Print Icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Imprimir Presupuesto
+          </button>
+          <button id="btn-presupuesto-a-factura" class="btn btn-teal">
+            ⚡ Generar Factura
+          </button>
+        </header>
+
+        <!-- Cabecera de reporte imprimible -->
+        <div class="print-only" style="margin-bottom: 24px; border-bottom: 2px solid #000; padding-bottom: 12px;">
+          <h1 style="font-size: 28px;">COTIZACIÓN DE ABERTURAS DE ALUMINIO</h1>
+          <p>Alumital SAS Sistemas - Reporte Técnico de Materiales y Costo Comercial</p>
+        </div>
+
+        <div class="budget-summary-panel">
+          
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- Tabla de Costeo Detallado de Ventanas -->
+            <div class="glass-panel">
+              <h3 style="margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Resumen de Materiales</h3>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Descripción</th>
+                      <th>Medidas</th>
+                      <th>Cant</th>
+                      <th>Aluminio</th>
+                      <th>Vidrio</th>
+                      <th>Burletes</th>
+                      <th>Subtotal Materiales</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-presupuesto-body">
+                    <!-- Dinámico -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Ajustador de Costos Unitarios (No se imprime) -->
+            <div class="glass-panel no-print">
+              <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; color: var(--accent-blue);">Ajustes de Precios Unitarios (COP)</h3>
+              
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                
+                <!-- Grupo: Aluminio -->
+                <div style="background: rgba(15, 23, 42, 0.02); border-radius: 8px; padding: 16px; border: 1px solid var(--border-color);">
+                  <h4 style="margin-bottom: 12px; color: var(--text-primary); font-size: 13px; border-bottom: 1px dashed var(--border-color); padding-bottom: 6px;">📏 Perfiles de Aluminio (por Metro)</h4>
+                  <div class="budget-config" style="grid-template-columns: 1fr;">
+                    <div class="form-group">
+                      <label for="price-aluminio">Aluminio Ventana</label>
+                      <input type="number" id="price-aluminio" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-aluminio-puerta">Aluminio Puerta</label>
+                      <input type="number" id="price-aluminio-puerta" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-aluminio-cabina">Aluminio Cabina</label>
+                      <input type="number" id="price-aluminio-cabina" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-tubo-cabina">Tubo Inox Cabina</label>
+                      <input type="number" id="price-tubo-cabina" class="form-input" step="1">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Grupo: Vidrio -->
+                <div style="background: rgba(20, 184, 166, 0.04); border-radius: 8px; padding: 16px; border: 1px solid rgba(20, 184, 166, 0.2);">
+                  <h4 style="margin-bottom: 12px; color: var(--accent-teal); font-size: 13px; border-bottom: 1px dashed rgba(20, 184, 166, 0.3); padding-bottom: 6px;">🟦 Vidrios (por M²)</h4>
+                  <div class="budget-config" style="grid-template-columns: 1fr;">
+                    <div class="form-group">
+                      <label for="price-vidrio">Vidrio Ventana y Puerta</label>
+                      <input type="number" id="price-vidrio" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-vidrio-cabina">Vidrio Cabina Templada</label>
+                      <input type="number" id="price-vidrio-cabina" class="form-input" step="1">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Grupo: Accesorios -->
+                <div style="background: rgba(14, 165, 233, 0.04); border-radius: 8px; padding: 16px; border: 1px solid rgba(14, 165, 233, 0.2); grid-column: 1 / -1;">
+                  <h4 style="margin-bottom: 12px; color: var(--accent-blue); font-size: 13px; border-bottom: 1px dashed rgba(14, 165, 233, 0.3); padding-bottom: 6px;">⚙️ Kits de Accesorios (por Unidad)</h4>
+                  <div class="budget-config" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                    <div class="form-group">
+                      <label for="price-acc-corrediza">Ventana Corrediza</label>
+                      <input type="number" id="price-acc-corrediza" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-acc-puerta-corrediza">Puerta Corrediza</label>
+                      <input type="number" id="price-acc-puerta-corrediza" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-acc-abatible">Ventana Abatible</label>
+                      <input type="number" id="price-acc-abatible" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-acc-puerta-abatible">Puerta Abatible</label>
+                      <input type="number" id="price-acc-puerta-abatible" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-acc-fijo">Paño Fijo</label>
+                      <input type="number" id="price-acc-fijo" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-acc-cabina-perfil">Cabina (Perfilería)</label>
+                      <input type="number" id="price-acc-cabina-perfil" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-acc-cabina-templada">Cabina (Templada/Inox)</label>
+                      <input type="number" id="price-acc-cabina-templada" class="form-input" step="1">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Grupo: Consumibles -->
+                <div style="background: rgba(15, 23, 42, 0.02); border-radius: 8px; padding: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
+                  <h4 style="margin-bottom: 12px; color: var(--text-primary); font-size: 13px; border-bottom: 1px dashed var(--border-color); padding-bottom: 6px;">🧰 Consumibles</h4>
+                  <div class="budget-config" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                    <div class="form-group">
+                      <label for="price-sellador">Sellador & Silicona (por Metro)</label>
+                      <input type="number" id="price-sellador" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-tornilleria">Tornillería (por Unidad/Abertura)</label>
+                      <input type="number" id="price-tornilleria" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-empaquetadura">Empaquetadura / Goma (por Metro)</label>
+                      <input type="number" id="price-empaquetadura" class="form-input" step="1">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="budget-config" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
+                <div class="form-group">
+                  <label for="price-mano-obra">Mano de Obra (% Materiales)</label>
+                  <input type="number" id="price-mano-obra" class="form-input">
+                </div>
+                <div class="form-group">
+                  <label for="price-ganancia">Margen de Ganancia (%)</label>
+                  <input type="number" id="price-ganancia" class="form-input">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen de Costeo Final / Presupuesto Total -->
+          <div>
+            <div class="glass-panel budget-summary-card" style="height: 100%; min-height: 350px;">
+              <div>
+                <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 16px;">Presupuesto Consolidado</h3>
+                
+                <div class="budget-row">
+                  <span>Costo Total Materiales</span>
+                  <span id="tot-materiales">$0.00</span>
+                </div>
+                
+                <div class="budget-row">
+                  <span>Mano de Obra</span>
+                  <span id="tot-mano-obra">$0.00</span>
+                </div>
+                
+                <div class="budget-row" style="font-weight: 600;">
+                  <span>Costo Total de Producción</span>
+                  <span id="tot-produccion">$0.00</span>
+                </div>
+
+                <div class="budget-row">
+                  <span>Margen Comercial Estimado</span>
+                  <span id="tot-ganancia">$0.00</span>
+                </div>
+              </div>
+
+              <div class="budget-row total">
+                <span>Precio de Venta Final</span>
+                <span id="tot-venta-final">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB: CLAUDE SKILL & AI -->
+      <section id="tab-skill" class="panel-tab">
+        <header class="content-header">
+          <div class="content-title">
+            <h2>Integración con Claude Skill</h2>
+            <p>Exporta las directrices técnicas a Claude y vuelve a importar los diseños estructurados en JSON.</p>
+          </div>
+        </header>
+
+        <div class="ai-panel-layout" style="margin-top: 24px;">
+          
+          <!-- Lado Izquierdo: Skill Prompt -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="copy-banner">
+              <h3>Fichero de Skill de Claude</h3>
+              <button id="btn-copy-skill" class="btn btn-secondary" style="padding: 6px 12px; font-size:12px;">
+                Copiar Instrucciones
+              </button>
+            </div>
+            <p style="font-size:13px; color: var(--text-secondary);">
+              Copia el código markdown de abajo y agrégalo en las <strong>Instrucciones de Proyecto</strong> de Claude (o pégalo directamente al iniciar un chat) para configurarlo como un experto en carpintería metálica.
+            </p>
+            <pre id="skill-code-block" class="markdown-container"></pre>
+          </div>
+
+          <!-- Lado Derecho: Importación JSON -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="import-box">
+              <h3>Importar Diseño desde Claude</h3>
+              <p style="font-size:13px; color: var(--text-secondary);">
+                Pega el objeto JSON generado por Claude para agregarlo instantáneamente a tu panel de Alumital SAS sin configurarlo manualmente:
+              </p>
+              <textarea id="import-json-textarea" class="form-input import-textarea" placeholder='Pega el JSON aquí. Ejemplo:
+{
+  "tipo": "corrediza",
+  "ancho": 1800,
+  "alto": 1500,
+  "cantidad": 3,
+  "nombre": "Ventana Importada"
+}'></textarea>
+              <button id="btn-importar-json" class="btn btn-primary" style="width: 100%;">
+                💡 Procesar e Importar Aberturas
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECCIÓN INVENTARIO -->
+      <section id="tab-inventario" class="panel-tab">
+        <header class="tab-header" style="margin-bottom: 24px;">
+          <div>
+            <h2>Inventario de Almacén</h2>
+            <p>Control de materias primas, perfiles de aluminio en stock y consumo del taller</p>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button id="btn-consumir-inventario" class="btn btn-primary">
+              ⚡ Consumir Materiales del Proyecto
+            </button>
+            <button id="btn-reset-inventario" class="btn btn-secondary">
+              🔄 Restaurar Valores por Defecto
+            </button>
+          </div>
+        </header>
+
+        <div class="form-grid" style="grid-template-columns: 2fr 1fr; gap: 24px;">
+          <!-- Tabla de Stock -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 16px;">
+            <h3>Materiales Disponibles</h3>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Material</th>
+                    <th>Existencias</th>
+                    <th>Unidad</th>
+                    <th>Costo ($ COP)</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="table-inventario-body">
+                  <!-- Inyectado dinámicamente por inventory.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Alert de Estado e Ingreso Rápido -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- Alert de Alerta de Faltantes -->
+            <div class="glass-panel" id="inventario-alerta-panel" style="border-left: 4px solid var(--success); display: none;">
+              <h4 id="inventario-alerta-titulo" style="color: var(--success); margin-bottom: 8px;">Stock Suficiente</h4>
+              <p id="inventario-alerta-texto" style="font-size: 13px; color: var(--text-secondary);">
+                Tienes suficiente material en stock para fabricar el proyecto de aberturas actual.
+              </p>
+            </div>
+
+            <!-- Panel de Entrada de Ajuste Rápido -->
+            <div class="glass-panel" style="display: flex; flex-direction: column; gap: 16px;">
+              <h3>Ajustar Stock Manual</h3>
+              <div class="form-group">
+                <label for="inv-select-material">Seleccionar Material</label>
+                <select id="inv-select-material" class="form-input">
+                  <!-- Opciones cargadas dinámicamente -->
+                </select>
+              </div>
+              <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0;">
+                <div class="form-group">
+                  <label for="inv-ajuste-cantidad">Cantidad</label>
+                  <input type="number" id="inv-ajuste-cantidad" class="form-input" value="10" step="any">
+                </div>
+                <div class="form-group">
+                  <label for="inv-ajuste-operacion">Operación</label>
+                  <select id="inv-ajuste-operacion" class="form-input">
+                    <option value="sumar">Sumar (+)</option>
+                    <option value="restar">Restar (-)</option>
+                    <option value="fijar">Fijar (=)</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-ajustar-stock" class="btn btn-teal" style="width: 100%;">
+                💾 Guardar Ajuste de Stock
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN FACTURACIÓN -->
+      <section id="tab-facturacion" class="panel-tab">
+        <!-- Encabezado de la pestaña (se oculta al imprimir) -->
+        <header class="tab-header no-print" style="margin-bottom: 24px;">
+          <div>
+            <h2>Generar Factura Comercial</h2>
+            <p>Crea recibos formales y cotizaciones impresas para tus clientes</p>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button id="btn-exportar-siigo" class="btn btn-secondary" style="background: rgba(14, 165, 233, 0.08); border-color: var(--border-color-active);">
+              🇨🇴 Exportar a Siigo API
+            </button>
+            <button id="btn-guardar-factura" class="btn btn-teal">
+              💾 Guardar en Historial
+            </button>
+            <button id="btn-imprimir-factura" class="btn btn-primary">
+              🖨️ Imprimir Factura / Guardar PDF
+            </button>
+          </div>
+        </header>
+
+        <div class="form-grid no-print" style="grid-template-columns: 1fr 2fr; gap: 24px;">
+          <!-- Formulario de datos del cliente -->
+          <div class="glass-panel" style="display: flex; flex-direction: column; gap: 16px; height: fit-content;">
+            <h3>Datos de Facturación</h3>
+            
+            <div class="form-group">
+              <label for="fac-cliente-nombre">Cliente / Empresa</label>
+              <input type="text" id="fac-cliente-nombre" class="form-input" placeholder="Nombre completo">
+            </div>
+
+            <div class="form-group">
+              <label for="fac-cliente-nit">NIT / Cédula</label>
+              <input type="text" id="fac-cliente-nit" class="form-input" placeholder="Ej. 900.123.456-7">
+            </div>
+
+            <div class="form-group">
+              <label for="fac-cliente-telefono">Celular / Teléfono</label>
+              <input type="text" id="fac-cliente-telefono" class="form-input" placeholder="Ej. 312 456 7890">
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 12px; margin-bottom: 0;">
+              <div class="form-group">
+                <label for="fac-fecha">Fecha Factura</label>
+                <input type="date" id="fac-fecha" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="fac-iva-porcentaje">IVA (%)</label>
+                <input type="number" id="fac-iva-porcentaje" class="form-input" value="19" min="0" max="100">
+              </div>
+            </div>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0;">
+              <div class="form-group">
+                <label for="fac-descuento-valor">Desc ($ COP)</label>
+                <input type="number" id="fac-descuento-valor" class="form-input" value="0" min="0">
+              </div>
+              <div class="form-group" style="padding-bottom: 8px; flex-direction: row; align-items: center; gap: 8px; margin-top: 15px;">
+                <input type="checkbox" id="fac-incluir-iva" checked style="width: 18px; height: 18px; cursor: pointer;">
+                <label for="fac-incluir-iva" style="margin-bottom: 0; cursor: pointer;">Cobrar IVA</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fac-observaciones">Observaciones / Validez</label>
+              <textarea id="fac-observaciones" class="form-input" placeholder="Ej. Validez de 15 días, entrega en 10 días hábiles." rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Previsualización de la Factura (esta parte se imprime también) -->
+          <div class="glass-panel invoice-preview-container" style="padding: 40px; background: #ffffff; color: #0f172a; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid #cbd5e1;">
+            
+            <!-- Encabezado Factura -->
+            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 24px;">
+              <div>
+                <h1 style="font-size: 26px; color: #0284c7; margin-bottom: 4px;">ALUMITAL SAS</h1>
+                <p style="font-size: 13px; color: #475569; font-weight: 600;">NIT 901.456.789-3</p>
+                <p style="font-size: 13px; color: #64748b;">Medellín, Colombia - Cel: 300 123 4567</p>
+                <p style="font-size: 13px; color: #64748b;">alumital.contacto@gmail.com</p>
+              </div>
+              <div style="text-align: right;">
+                <h2 style="font-size: 20px; color: #0f172a; margin-bottom: 8px;">COTIZACIÓN / FACTURA</h2>
+                <p id="fac-preview-numero" style="font-size: 13px; font-weight: bold; color: #e11d48; margin-bottom: 4px;">N° FACT-000000</p>
+                <p style="font-size: 12px; color: #64748b;" id="fac-preview-fecha-cabecera">Fecha: DD/MM/AAAA</p>
+              </div>
+            </div>
+
+            <!-- Detalles del Cliente -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px; font-size: 13px; line-height: 1.6;">
+              <div>
+                <h4 style="text-transform: uppercase; color: #64748b; font-size: 10px; letter-spacing: 0.05em; margin-bottom: 4px;">Facturado a:</h4>
+                <p><strong id="fac-preview-cliente-nombre" style="font-size: 14px; color: #0f172a;">Consumidor Final</strong></p>
+                <p id="fac-preview-cliente-nit">NIT/C.C: S/N</p>
+                <p id="fac-preview-cliente-telefono">Teléfono: S/N</p>
+              </div>
+              <div style="text-align: right;">
+                <h4 style="text-transform: uppercase; color: #64748b; font-size: 10px; letter-spacing: 0.05em; margin-bottom: 4px;">Detalles de la Operación:</h4>
+                <p>Moneda: Pesos Colombianos (COP)</p>
+                <p>Condición: Contado contra entrega</p>
+                <p>Validez: 15 días calendario</p>
+              </div>
+            </div>
+
+            <!-- Detalle de Aberturas -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px;">
+              <thead>
+                <tr style="border-bottom: 2px solid #cbd5e1; text-align: left;">
+                  <th style="padding: 10px 5px; color: #475569; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em;">Descripción del Item</th>
+                  <th style="padding: 10px 5px; color: #475569; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; text-align: center;">Cant</th>
+                  <th style="padding: 10px 5px; color: #475569; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; text-align: right;">Precio Unit.</th>
+                  <th style="padding: 10px 5px; color: #475569; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; text-align: right;">Total</th>
+                </tr>
+              </thead>
+              <tbody id="fac-preview-table-body">
+                <!-- Rellenado dinámicamente -->
+              </tbody>
+            </table>
+
+            <!-- Desglose de Totales -->
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid #cbd5e1; padding-top: 16px;">
+              <div style="max-width: 50%; font-size: 11px; color: #64748b; line-height: 1.5;">
+                <strong>Términos y Condiciones:</strong>
+                <p id="fac-preview-observaciones">Este documento es una cotización formal. Los cortes se inician con el 60% de anticipo. Las entregas se coordinan con el instalador.</p>
+              </div>
+              <div style="width: 250px; font-size: 13px; line-height: 2;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9;">
+                  <span style="color: #64748b;">Subtotal:</span>
+                  <strong id="fac-preview-subtotal">$0 COP</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; display: none;" id="fac-preview-descuento-row">
+                  <span style="color: #e11d48;">Descuento:</span>
+                  <strong id="fac-preview-descuento" style="color: #e11d48;">-$0 COP</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9;">
+                  <span style="color: #64748b;" id="fac-preview-label-iva">IVA (19%):</span>
+                  <strong id="fac-preview-iva">$0 COP</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 2px solid #0f172a; margin-top: 8px; font-size: 16px; padding-top: 4px;">
+                  <strong>Total a Pagar:</strong>
+                  <strong id="fac-preview-total" style="color: #0284c7;">$0 COP</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Firmas -->
+            <div style="display: flex; justify-content: space-between; margin-top: 60px; font-size: 12px; border-top: 1px dashed #cbd5e1; padding-top: 24px;">
+              <div style="width: 45%; text-align: center;">
+                <p>_____________________________________</p>
+                <p><strong>Firma Autorizada Alumital SAS</strong></p>
+              </div>
+              <div style="width: 45%; text-align: center;">
+                <p>_____________________________________</p>
+                <p><strong>Aceptado Cliente (Firma y Sello)</strong></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Historial de Facturas en la pestaña (se oculta al imprimir) -->
+        <div class="glass-panel no-print" style="margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
+          <h3>Historial de Facturas Guardadas</h3>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Factura N°</th>
+                  <th>Cliente</th>
+                  <th>Fecha</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="fac-historial-body">
+                <!-- Rellenado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: DESPIECE / PRODUCCIÓN -->
+      <section id="tab-produccion" class="panel-tab">
+        <header class="content-header no-print">
+          <div class="content-title">
+            <h2>Orden de Producción y Cortes</h2>
+            <p>Listado de despiece de perfiles y vidrios para el taller.</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-guardar-produccion" class="btn btn-secondary" onclick="window.guardarOrdenProduccion()">
+              💾 Guardar Orden
+            </button>
+            <button id="btn-imprimir-produccion" class="btn btn-primary" onclick="window.imprimirOrdenProduccion()">
+              🖨️ Imprimir Orden
+            </button>
+          </div>
+        </header>
+
+        <!-- Historial de Órdenes Guardadas -->
+        <div id="historial-produccion-section" class="no-print" style="margin-top: 20px; display: none;">
+          <h3 style="margin-bottom: 15px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">
+            Órdenes de Producción Guardadas
+          </h3>
+          <div class="table-container">
+            <table class="data-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>Referencia / Obra</th>
+                  <th>Fecha</th>
+                  <th>Items</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="historial-produccion-body">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Contenedor donde se inyectará el despiece de los items -->
+        <div id="produccion-container" style="display: flex; flex-direction: column; gap: 30px; margin-top: 20px;">
+          <!-- Aquí se renderiza production.js -->
+        </div>
+      </section>
+
+      <!-- Modal para Exportación Siigo API -->
+      <div id="modal-siigo" class="modal-overlay no-print" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="glass-panel" style="width: 92%; max-width: 640px; background: #ffffff; color: #0f172a; padding: 28px; display: flex; flex-direction: column; gap: 16px; border: 1px solid #cbd5e1; box-shadow: 0 24px 48px rgba(0,0,0,0.18); border-radius: 14px; max-height: 90vh; overflow-y: auto;">
+          
+          <!-- Cabecera -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+              <div>
+                <h3 style="color: #0022cc; margin-bottom: 2px;">Exportar a Siigo Nube</h3>
+              <p style="font-size: 12px; color: #64748b; margin: 0;">Factura de Venta · API v1/invoices</p>
+            </div>
+            <button id="btn-close-siigo-modal" style="background: none; border: none; font-size: 22px; cursor: pointer; color: #64748b; font-weight: bold; padding: 0 6px; line-height: 1;">&times;</button>
+          </div>
+
+          <!-- PASO 1: Credenciales para obtener token -->
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <p style="font-size: 12px; font-weight: 800; color: #0022cc; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              Paso 1 — Obtener Token Automáticamente
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: #64748b;">Usuario API (correo)</label>
+                <input id="siigo-username" type="email" class="form-input"
+                  value="angelamariagiraldo@gmail.com"
+                  style="margin-top: 4px; font-size: 12px; background: #fff; color: #0f172a; border: 1px solid #cbd5e1;">
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 600; color: #64748b;">Access Key (de Siigo)</label>
+                <input id="siigo-access-key-input" type="password" class="form-input"
+                  placeholder="Pega tu Access Key aquí"
+                  style="margin-top: 4px; font-size: 12px; background: #fff; color: #0f172a; border: 1px solid #cbd5e1;">
+              </div>
+            </div>
+            <button id="btn-obtener-token" class="btn btn-secondary" style="font-size: 13px; font-weight: 700; border-color: #0022cc; color: #0022cc; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Obtener Token Automáticamente
+            </button>
+            <div id="siigo-token-status" style="display:none; font-size: 12px; padding: 8px 12px; border-radius: 6px;"></div>
+          </div>
+
+          <!-- PASO 2: Centro de Costos -->
+          <div>
+            <label style="font-size: 12px; font-weight: 800; color: #0022cc; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Paso 2 — Centro de Costos (Opcional)
+            </label>
+            <input type="number" id="fac-cost-center" class="form-input"
+              placeholder="Siigo ID (Ej: 1, 2, 3...)"
+              style="margin-top: 6px; font-size: 12px; background: #f8fafc; color: #0f172a; border: 1px solid #cbd5e1;">
+            <p style="font-size: 11px; color: #64748b; margin-top: 4px;">Si tu cuenta de Siigo exige centros de costo obligatorios en facturas, escribe el ID aquí.</p>
+          </div>
+
+          <!-- PASO 3: Token resultante (auto-llenado o manual) -->
+          <div>
+            <label style="font-size: 12px; font-weight: 800; color: #0022cc; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+              Paso 3 — Access Token (se llena automáticamente)
+            </label>
+            <textarea id="siigo-access-token" class="form-input" rows="2"
+              placeholder="El token aparecerá aquí al hacer clic en ⚡ Obtener Token. También puedes pegarlo manualmente."
+              style="margin-top: 6px; font-family: monospace; font-size: 10px; background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; resize: none; line-height: 1.4;"></textarea>
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+              ⏱ Válido 24 horas. Mañana repite el <strong>Paso 1</strong>.
+            </p>
+          </div>
+
+          <!-- Panel de estado del envío -->
+          <div id="siigo-envio-status" style="display: none; padding: 12px 16px; border-radius: 8px; border: 1px solid; font-size: 13px; line-height: 1.6;"></div>
+
+          <!-- Botón principal: Enviar automáticamente -->
+          <button id="btn-enviar-siigo" class="btn btn-primary" style="background: #0022cc; border-color: #0022cc; font-size: 15px; padding: 14px; font-weight: 800; letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            Enviar a Siigo Nube
+          </button>
+
+          <!-- Separador -->
+          <div style="display: flex; align-items: center; gap: 12px; color: #94a3b8; font-size: 12px;">
+            <div style="flex: 1; height: 1px; background: #e2e8f0;"></div>
+            <span>O copia el payload manualmente</span>
+            <div style="flex: 1; height: 1px; background: #e2e8f0;"></div>
+          </div>
+
+          <!-- Previsualización JSON -->
+          <pre id="siigo-json-preview" style="background: #f1f5f9; padding: 14px; border-radius: 8px; font-family: monospace; font-size: 10.5px; max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; color: #334155; text-align: left; margin: 0;"></pre>
+
+          <!-- Botones copiar -->
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-copy-siigo-json" class="btn btn-secondary" style="flex: 1; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; color: #0022cc; border-color: #e2e8f0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+              Copiar JSON
+            </button>
+            <button id="btn-copy-siigo-curl" class="btn btn-secondary" style="flex: 1; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; color: #0022cc; border-color: #e2e8f0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0022cc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              Copiar cURL
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/calculator.js?v=2.5.3"></script>
+  <script src="js/optimizer.js?v=2.5.3"></script>
+  <script src="js/budget.js?v=2.5.3"></script>
+  <script src="js/inventory.js?v=2.5.3"></script>
+  <script src="js/invoice.js?v=2.5.3"></script>
+  <script src="js/production.js?v=2.5.3"></script>
+  <script src="js/app.js?v=2.5.3"></script>
+</body>
+</html>

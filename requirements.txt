@@ -1,0 +1,2 @@
+# Railway requires a requirements.txt file to detect a Python project.
+# No external dependencies are needed since we use built-in http.server and urllib.
