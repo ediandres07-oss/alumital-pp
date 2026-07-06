@@ -30,7 +30,7 @@
 
     <div class="login-card">
       <div class="login-logo" style="margin-bottom: 24px; text-align: center;">
-        <img src="img/logo.jpg" alt="Alumital SAS Logo" style="max-width: 240px; width: 100%; height: auto; border-radius: 6px;">
+        <img src="img/logo.jpg" alt="Alumital SAS Logo" draggable="false" style="max-width: 240px; width: 100%; height: auto; border-radius: 6px; pointer-events: none; -webkit-user-drag: none;">
       </div>
       <form id="login-form" onsubmit="event.preventDefault(); iniciarSesion(document.getElementById('login-email').value, document.getElementById('login-password').value);">
         <div class="form-group" style="margin-bottom:12px;">

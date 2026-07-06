@@ -272,6 +272,7 @@
         initialX = e.touches[0].clientX - xOffset;
         initialY = e.touches[0].clientY - yOffset;
       } else {
+        e.preventDefault(); // Evitar arrastre nativo de imágenes del navegador
         initialX = e.clientX - xOffset;
         initialY = e.clientY - yOffset;
       }
