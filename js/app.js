@@ -1431,7 +1431,7 @@ function renderizarPresupuesto() {
       <td>${d.ancho}x${d.alto} mm</td>
       <td>${d.cantidad}</td>
       <td>${d.aluminioM} m</td>
-      <td>${d.vidrioM2} m² <span style="font-size:11px;color:#14b8a6;font-weight:bold;">(${d.pesoVidrioKg} kg)</span></td>
+      <td>${d.vidrioM2} m² <span style="font-size:11px;color:#14b8a6;font-weight:bold;">(${d.pesoVidrioKg} kg | ${formatearMoneda(d.costoVidrio)})</span></td>
       <td>${d.selladoresM} m</td>
       <td><strong>${formatearMoneda(d.costoMateriales)}</strong></td>
     `;

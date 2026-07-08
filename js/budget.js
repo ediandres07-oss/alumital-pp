@@ -211,6 +211,7 @@ function calcularPresupuesto(itemsVentanas, preciosConfig = PRECIOS_DEFECTO) {
       aluminioM: parseFloat(metrosAluminioTotal.toFixed(2)),
       vidrioM2: parseFloat(m2VidrioTotal.toFixed(2)),
       pesoVidrioKg: parseFloat(pesoVidrioTotal.toFixed(2)),
+      costoVidrio: parseFloat(costoItemVidrio.toFixed(2)),
       tipoVidrio: item.tipoVidrio || 'monolitico',
       espesorVidrio: item.espesorVidrio || '4',
       colorVidrio: item.colorVidrio || 'claro',
