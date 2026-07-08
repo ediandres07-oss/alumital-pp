@@ -50,6 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof inicializarInventario === 'function') inicializarInventario();
   if (typeof inicializarFacturacion === 'function') inicializarFacturacion();
 
+  // Controlador de colapso de barra lateral en Desktop
+  const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+  if (btnToggleSidebar) {
+    btnToggleSidebar.addEventListener('click', () => {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) {
+        sidebar.classList.toggle('collapsed');
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebar-collapsed', isCollapsed ? 'true' : 'false');
+      }
+    });
+  }
+
+  // Restaurar estado de la barra lateral
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar && localStorage.getItem('sidebar-collapsed') === 'true') {
+    sidebar.classList.add('collapsed');
+  }
+
   // Realizar primer cálculo por defecto
   actualizarCalculoConfigurador();
 });

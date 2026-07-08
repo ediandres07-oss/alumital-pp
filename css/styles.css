@@ -1316,3 +1316,51 @@ input[type="range"]::-webkit-slider-thumb:hover {
   z-index: 5;
 }
 
+/* ============================================
+   SIDEBAR COLLAPSE TRANSITION (DESKTOP)
+   ============================================ */
+@media (min-width: 769px) {
+  .sidebar {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: var(--sidebar-width);
+    overflow: hidden;
+  }
+  .sidebar.collapsed {
+    width: 70px;
+    padding: 24px 8px;
+  }
+  .sidebar.collapsed #sidebar-logo {
+    opacity: 0;
+    max-width: 0;
+    pointer-events: none;
+  }
+  .sidebar.collapsed .logo-container {
+    justify-content: center !important;
+  }
+  .sidebar.collapsed #btn-toggle-sidebar {
+    transform: rotate(180deg);
+  }
+  .sidebar.collapsed .menu-item span,
+  .sidebar.collapsed .sidebar-footer span,
+  .sidebar.collapsed .sidebar-user span {
+    display: none;
+  }
+  .sidebar.collapsed .menu-item svg {
+    margin-right: 0;
+  }
+  .sidebar.collapsed .menu-item {
+    justify-content: center;
+    padding: 12px;
+  }
+  .sidebar.collapsed .sidebar-user {
+    justify-content: center;
+  }
+
+  .main-content {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 70px !important;
+  }
+}
+
