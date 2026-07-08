@@ -377,6 +377,15 @@ function dibujarSVG(tipo, width, height, targetSvgId = 'window-preview-svg', ite
     }
   }
 
+  // Calcular medidas reales de vidrios para mostrarlas en la vista previa
+  const tipoVidrio = stateContext.tipoVidrio || 'monolitico';
+  const espesorVidrio = stateContext.espesorVidrio || '4';
+  const colorVidrio = stateContext.colorVidrio || 'claro';
+  const calcResult = calcularVentana(tipo, width, height, stateContext.sistemaPerfil, stateContext.categoria, stateContext.estiloCabina, tipoVidrio, espesorVidrio, colorVidrio);
+  const glassLabel = (calcResult.vidrios && calcResult.vidrios[0]) 
+                     ? `Vidrio: ${calcResult.vidrios[0].ancho} x ${calcResult.vidrios[0].alto} mm` 
+                     : '';
+
   // Limpiar e inyectar defs
   svg.innerHTML = '';
   crearDefinicionesSVG(svg);
@@ -864,6 +873,21 @@ function dibujarEstructuraHoja(parentG, x, y, w, h, ST, ensamble, codeV, codeTop
       dibujarRectangulo(parentG, x - 2, y + 25, 4, 10, 'url(#metal-plata)', '#475569', '', '');
       dibujarRectangulo(parentG, x - 2, y + h - 35, 4, 10, 'url(#metal-plata)', '#475569', '', '');
     }
+
+    // Dibujar texto de medidas en cabina solo vidrio
+    if (STATE.currentCalculation && STATE.currentCalculation.vidrios && STATE.currentCalculation.vidrios[0]) {
+      const v0 = STATE.currentCalculation.vidrios[0];
+      const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      txt.setAttribute('x', x + w / 2);
+      txt.setAttribute('y', y + h - 15);
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('fill', 'rgba(0, 0, 0, 0.7)');
+      txt.setAttribute('font-size', '6.5px');
+      txt.setAttribute('font-weight', 'bold');
+      txt.setAttribute('font-family', 'sans-serif');
+      txt.textContent = `Vidrio: ${v0.ancho} x ${v0.alto} mm`;
+      parentG.appendChild(txt);
+    }
     return;
   }
 
@@ -896,6 +920,21 @@ function dibujarEstructuraHoja(parentG, x, y, w, h, ST, ensamble, codeV, codeTop
   // Biseles metálicos brillantes / Reflejos especulares 3D
   dibujarRectangulo(parentG, x + 0.8, y + 0.8, w - 1.6, h - 1.6, 'none', 'rgba(255, 255, 255, 0.22)', '', '', '0.8');
   dibujarRectangulo(parentG, x + ST - 0.8, y + ST - 0.8, w - ST * 2 + 1.6, h - ST - bottomST + 1.6, 'none', 'rgba(255, 255, 255, 0.15)', '', '', '0.8');
+
+  // Dibujar texto de medidas en vidrio estándar con marco
+  if (STATE.currentCalculation && STATE.currentCalculation.vidrios && STATE.currentCalculation.vidrios[0]) {
+    const v0 = STATE.currentCalculation.vidrios[0];
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', x + w / 2);
+    txt.setAttribute('y', y + h - bottomST - 10);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('fill', '#1e293b'); // dark grey/slate for readability
+    txt.setAttribute('font-size', '6.5px');
+    txt.setAttribute('font-weight', 'bold');
+    txt.setAttribute('font-family', 'sans-serif');
+    txt.textContent = `Vidrio: ${v0.ancho} x ${v0.alto} mm`;
+    parentG.appendChild(txt);
+  }
 }
 
 function dibujarVidrioConBrillo(parentG, x, y, w, h) {
