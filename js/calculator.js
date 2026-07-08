@@ -75,7 +75,7 @@ const SISTEMAS_PERFIL = {
  * @param {string} sistemaId - ID de configuración del sistema (ej: 'VC5020_90')
  * @returns {object} { perfiles: Array, vidrios: Array }
  */
-function calcularVentana(tipo, width, height, sistemaId = 'VC5020_90', categoria = 'ventana', estiloCabina = 'con_perfil') {
+function calcularVentana(tipo, width, height, sistemaId = 'VC5020_90', categoria = 'ventana', estiloCabina = 'con_perfil', tipoVidrio = 'monolitico', espesorVidrio = '4', colorVidrio = 'claro') {
   const perfiles = [];
   const vidrios = [];
 
@@ -552,6 +552,27 @@ function calcularVentana(tipo, width, height, sistemaId = 'VC5020_90', categoria
       area: parseFloat(((anchoVidrio * altoVidrio) / 1000000).toFixed(3))
     });
   }
+
+  // Enriquecer y calcular peso de los vidrios al final
+  const espesorNum = parseFloat(espesorVidrio) || 4;
+  vidrios.forEach(v => {
+    v.tipo = tipoVidrio;
+    v.espesor = espesorVidrio;
+    v.color = colorVidrio;
+
+    // Calcular espesor real del vidrio para el peso
+    let espesorReal = espesorNum;
+    if (espesorVidrio.includes('+')) {
+      espesorReal = espesorVidrio.split('+').reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    } else if (espesorVidrio.includes('-')) {
+      const parts = espesorVidrio.split('-');
+      espesorReal = parseFloat(parts[0]) + parseFloat(parts[parts.length - 1]);
+    }
+
+    // Fórmula física de peso (kg) = Ancho(m) * Alto(m) * Cantidad * Espesor(mm) * 2.5 (densidad)
+    const peso = ((v.ancho / 1000) * (v.alto / 1000)) * v.cantidad * espesorReal * 2.5;
+    v.pesoKg = parseFloat(peso.toFixed(2));
+  });
 
   return { perfiles, vidrios };
 }

@@ -294,6 +294,40 @@
               </div>
             </div>
 
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div class="form-group">
+                <label for="config-tipo-vidrio">Tipo de Vidrio</label>
+                <select id="config-tipo-vidrio">
+                  <option value="monolitico" selected>Monolítico</option>
+                  <option value="templado">Templado</option>
+                  <option value="laminado">Laminado</option>
+                  <option value="dvh">DVH (Doble Vidrio)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="config-espesor-vidrio">Espesor</label>
+                <select id="config-espesor-vidrio">
+                  <option value="4" selected>4 mm</option>
+                  <option value="5">5 mm</option>
+                  <option value="6">6 mm</option>
+                  <option value="8">8 mm</option>
+                  <option value="10">10 mm</option>
+                  <option value="12">12 mm</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="config-color-vidrio">Color</label>
+                <select id="config-color-vidrio">
+                  <option value="claro" selected>Claro</option>
+                  <option value="bronce">Bronce</option>
+                  <option value="gris">Gris</option>
+                  <option value="opalizado">Opalizado</option>
+                  <option value="azul">Azul</option>
+                  <option value="reflectivo">Reflectivo</option>
+                </select>
+              </div>
+            </div>
+
             <div class="form-grid">
               <div class="form-group">
                 <label for="config-ancho">Ancho Total (W en mm)</label>
@@ -341,11 +375,11 @@
                   <table class="table" id="table-vidrios">
                     <thead>
                       <tr>
-                        <th>Tipo</th>
+                        <th>Espes./Color</th>
                         <th>Vidrio</th>
                         <th>Cant</th>
                         <th>Dimensiones</th>
-                        <th>Área (m²)</th>
+                        <th>Área / Peso</th>
                       </tr>
                     </thead>
                     <tbody id="table-vidrios-body">
@@ -541,15 +575,23 @@
 
                 <!-- Grupo: Vidrio -->
                 <div style="background: rgba(20, 184, 166, 0.04); border-radius: 8px; padding: 16px; border: 1px solid rgba(20, 184, 166, 0.2);">
-                  <h4 style="margin-bottom: 12px; color: var(--accent-teal); font-size: 13px; border-bottom: 1px dashed rgba(20, 184, 166, 0.3); padding-bottom: 6px;">🟦 Vidrios (por M²)</h4>
-                  <div class="budget-config" style="grid-template-columns: 1fr;">
+                  <h4 style="margin-bottom: 12px; color: var(--accent-teal); font-size: 13px; border-bottom: 1px dashed rgba(20, 184, 166, 0.3); padding-bottom: 6px;">🟦 Precios Base de Vidrios (por M²)</h4>
+                  <div class="budget-config" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
                     <div class="form-group">
-                      <label for="price-vidrio">Vidrio Ventana y Puerta</label>
-                      <input type="number" id="price-vidrio" class="form-input" step="1">
+                      <label for="price-vidrio-monolitico">Vidrio Monolítico M²</label>
+                      <input type="number" id="price-vidrio-monolitico" class="form-input" step="1">
                     </div>
                     <div class="form-group">
-                      <label for="price-vidrio-cabina">Vidrio Cabina Templada</label>
-                      <input type="number" id="price-vidrio-cabina" class="form-input" step="1">
+                      <label for="price-vidrio-templado">Vidrio Templado M²</label>
+                      <input type="number" id="price-vidrio-templado" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-vidrio-laminado">Vidrio Laminado M²</label>
+                      <input type="number" id="price-vidrio-laminado" class="form-input" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label for="price-vidrio-dvh">Vidrio DVH M²</label>
+                      <input type="number" id="price-vidrio-dvh" class="form-input" step="1">
                     </div>
                   </div>
                 </div>
@@ -631,6 +673,11 @@
                 <div class="budget-row">
                   <span>Costo Total Materiales</span>
                   <span id="tot-materiales">$0.00</span>
+                </div>
+                
+                <div class="budget-row" style="color: var(--accent-teal); font-size: 13px; font-weight: 500;">
+                  <span>Peso Total Vidrios</span>
+                  <span id="tot-peso-vidrio">0.00 kg</span>
                 </div>
                 
                 <div class="budget-row">

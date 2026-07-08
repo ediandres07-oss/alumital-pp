@@ -104,7 +104,7 @@ function initNavigation() {
 
 /* ==================== 2. CONFIGURADOR & SVG ==================== */
 function initFormListeners() {
-  const inputs = ['config-categoria', 'config-cabina-tipo', 'config-tipo', 'config-ancho', 'config-alto', 'config-cantidad', 'config-nombre', 'config-ensamble', 'config-acabado', 'config-apertura'];
+  const inputs = ['config-categoria', 'config-cabina-tipo', 'config-tipo', 'config-ancho', 'config-alto', 'config-cantidad', 'config-nombre', 'config-ensamble', 'config-acabado', 'config-apertura', 'config-tipo-vidrio', 'config-espesor-vidrio', 'config-color-vidrio'];
   inputs.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -114,6 +114,33 @@ function initFormListeners() {
       }
     }
   });
+
+  const selectTipoVidrio = document.getElementById('config-tipo-vidrio');
+  if (selectTipoVidrio) {
+    selectTipoVidrio.addEventListener('change', function () {
+      const tipo = this.value;
+      const selectEspesor = document.getElementById('config-espesor-vidrio');
+      if (selectEspesor) {
+        selectEspesor.innerHTML = '';
+        let options = [];
+        if (tipo === 'monolitico' || tipo === 'templado') {
+          options = ['4', '5', '6', '8', '10', '12'];
+        } else if (tipo === 'laminado') {
+          options = ['3+3', '4+4', '5+5', '6+6'];
+        } else if (tipo === 'dvh') {
+          options = ['4-9-4', '4-12-4', '5-12-5'];
+        }
+        options.forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt;
+          o.textContent = opt + ' mm';
+          selectEspesor.appendChild(o);
+        });
+        // Recalcular con el primer espesor cargado
+        actualizarCalculoConfigurador();
+      }
+    });
+  }
 
   const selectCategoria = document.getElementById('config-categoria');
   if (selectCategoria) {
@@ -187,6 +214,10 @@ function actualizarCalculoConfigurador() {
   const acabado = document.getElementById('config-acabado').value || 'negro';
   const apertura = parseInt(document.getElementById('config-apertura').value) || 0;
 
+  const tipoVidrio = document.getElementById('config-tipo-vidrio').value || 'monolitico';
+  const espesorVidrio = document.getElementById('config-espesor-vidrio').value || '4';
+  const colorVidrio = document.getElementById('config-color-vidrio').value || 'claro';
+
   if (width < 100 || height < 100) {
     return;
   }
@@ -198,12 +229,13 @@ function actualizarCalculoConfigurador() {
   STATE.aperturaPorcentaje = apertura;
 
   // Ejecutar cálculo geométrico
-  const resultado = calcularVentana(tipo, width, height, STATE.sistemaPerfil, categoria, estiloCabina);
+  const resultado = calcularVentana(tipo, width, height, STATE.sistemaPerfil, categoria, estiloCabina, tipoVidrio, espesorVidrio, colorVidrio);
   STATE.currentCalculation = {
     tipo, width, height, cantidad, nombre, categoria, estiloCabina,
     sistemaPerfil: STATE.sistemaPerfil,
     acabadoAluminio: STATE.acabadoAluminio,
     aperturaPorcentaje: STATE.aperturaPorcentaje,
+    tipoVidrio, espesorVidrio, colorVidrio,
     perfiles: resultado.perfiles,
     vidrios: resultado.vidrios
   };
@@ -1065,11 +1097,11 @@ function renderizarTablasResultado(perfiles, vidrios) {
       tr.className = 'profile-table-row';
       tr.setAttribute('data-codigo', 'GLASS');
       tr.innerHTML = `
-        <td><span class="badge badge-glass">VIDRIO</span></td>
-        <td><strong>${v.nombre}</strong></td>
+        <td><span class="badge badge-glass" style="font-size:10px; background:#14b8a6; color:white; padding: 2px 6px; border-radius:4px;">${v.espesor}mm / ${v.color.toUpperCase()}</span></td>
+        <td><strong>${v.nombre}</strong> <span style="font-size:11px; color:#64748b;">(${v.tipo})</span></td>
         <td>${v.cantidad}</td>
         <td><strong>${v.ancho} x ${v.alto} mm</strong></td>
-        <td>${v.area} m²</td>
+        <td>${v.area} m² / <strong>${v.pesoKg} kg</strong></td>
       `;
       tbodyVidrios.appendChild(tr);
     });
@@ -1307,8 +1339,10 @@ function initBudgetSettings() {
     { id: 'price-aluminio-puerta', key: 'aluminioPuertaMetro' },
     { id: 'price-aluminio-cabina', key: 'aluminioCabinaMetro' },
     { id: 'price-tubo-cabina', key: 'tuboAceroCabinaMetro' },
-    { id: 'price-vidrio', key: 'vidrioM2' },
-    { id: 'price-vidrio-cabina', key: 'vidrioTempladoCabinaM2' },
+    { id: 'price-vidrio-monolitico', key: 'vidrioMonoliticoM2' },
+    { id: 'price-vidrio-templado', key: 'vidrioTempladoM2' },
+    { id: 'price-vidrio-laminado', key: 'vidrioLaminadoM2' },
+    { id: 'price-vidrio-dvh', key: 'vidrioDvhM2' },
     { id: 'price-acc-corrediza', key: 'accesoriosCorrediza' },
     { id: 'price-acc-puerta-corrediza', key: 'accesoriosPuertaCorrediza' },
     { id: 'price-acc-cabina-perfil', key: 'accesoriosCabinaPerfil' },
@@ -1365,6 +1399,7 @@ function renderizarPresupuesto() {
     
     // Limpiar totales
     document.getElementById('tot-materiales').textContent = formatearMoneda(0);
+    document.getElementById('tot-peso-vidrio').textContent = '0.00 kg';
     document.getElementById('tot-mano-obra').textContent = formatearMoneda(0);
     document.getElementById('tot-produccion').textContent = formatearMoneda(0);
     document.getElementById('tot-ganancia').textContent = formatearMoneda(0);
@@ -1390,7 +1425,7 @@ function renderizarPresupuesto() {
       <td>${d.ancho}x${d.alto} mm</td>
       <td>${d.cantidad}</td>
       <td>${d.aluminioM} m</td>
-      <td>${d.vidrioM2} m²</td>
+      <td>${d.vidrioM2} m² <span style="font-size:11px;color:#14b8a6;font-weight:bold;">(${d.pesoVidrioKg} kg)</span></td>
       <td>${d.selladoresM} m</td>
       <td><strong>${formatearMoneda(d.costoMateriales)}</strong></td>
     `;
@@ -1399,6 +1434,7 @@ function renderizarPresupuesto() {
 
   // Renderizar totales acumulados
   document.getElementById('tot-materiales').textContent = formatearMoneda(pres.totalMateriales);
+  document.getElementById('tot-peso-vidrio').textContent = pres.totalPesoVidrio.toFixed(2) + ' kg';
   document.getElementById('tot-mano-obra').textContent = formatearMoneda(pres.manoObra);
   document.getElementById('tot-produccion').textContent = formatearMoneda(pres.costoProduccion);
   document.getElementById('tot-ganancia').textContent = formatearMoneda(pres.ganancia);

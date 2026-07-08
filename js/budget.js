@@ -9,8 +9,10 @@ const PRECIOS_DEFECTO = {
   aluminioPuertaMetro: 32000,       // COP por metro (puerta pesada)
   aluminioCabinaMetro: 22000,       // COP por metro (cabina aluminio)
   tuboAceroCabinaMetro: 45000,      // COP por metro (tubo acero inox)
-  vidrioM2: 80000,                  // COP por m² de vidrio templado ventana-puerta
-  vidrioTempladoCabinaM2: 120000,   // COP por m² de vidrio templado grueso de cabina
+  vidrioMonoliticoM2: 50000,        // COP por m² de vidrio monolítico
+  vidrioTempladoM2: 80000,          // COP por m² de vidrio templado
+  vidrioLaminadoM2: 120000,         // COP por m² de vidrio laminado
+  vidrioDvhM2: 180000,              // COP por m² de vidrio DVH
   accesoriosCorrediza: 35000,        // COP por kit ventana corrediza
   accesoriosPuertaCorrediza: 65000, // COP por kit puerta corrediza
   accesoriosCabinaPerfil: 40000,    // COP por kit accesorios cabina con perfil
@@ -45,6 +47,7 @@ function calcularPresupuesto(itemsVentanas, preciosConfig = PRECIOS_DEFECTO) {
   let totalMetrosSellador = 0;
   let totalUnidadesTornilleria = 0;
   let totalMetrosEmpaquetadura = 0;
+  let totalPesoVidrio = 0;
 
   const desgloseDetallado = [];
 
@@ -77,16 +80,41 @@ function calcularPresupuesto(itemsVentanas, preciosConfig = PRECIOS_DEFECTO) {
 
     const metrosAluminioTotal = metrosAluminioItem * qty;
 
-    // 2. Vidrio (Costo diferenciado para cabinas por espesor)
+    // 2. Vidrio (Costo diferenciado por Tipo de Vidrio y Color)
     let m2VidrioItem = 0;
     item.vidrios.forEach(v => {
-      m2VidrioItem += ((v.ancho * v.alto) / 1000000) * v.cantidad;
+      const m2 = ((v.ancho * v.alto) / 1000000) * v.cantidad;
+      m2VidrioItem += m2;
+
+      // Obtener el precio base según el tipo de vidrio
+      let precioBase = 80000;
+      if (item.categoria === 'cabina_baño' && item.estiloCabina === 'solo_vidrio') {
+        precioBase = preciosConfig.vidrioTempladoM2 || 80000; // cabina solo vidrio usa templado
+      } else {
+        if (v.tipo === 'monolitico') {
+          precioBase = preciosConfig.vidrioMonoliticoM2 || 50000;
+        } else if (v.tipo === 'templado') {
+          precioBase = preciosConfig.vidrioTempladoM2 || 80000;
+        } else if (v.tipo === 'laminado') {
+          precioBase = preciosConfig.vidrioLaminadoM2 || 120000;
+        } else if (v.tipo === 'dvh') {
+          precioBase = preciosConfig.vidrioDvhM2 || 180000;
+        }
+      }
+
+      // Aplicar recargo por color
+      let factorColor = 1.0;
+      if (v.color === 'bronce' || v.color === 'gris') {
+        factorColor = 1.15; // 15% recargo
+      } else if (v.color === 'opalizado' || v.color === 'azul') {
+        factorColor = 1.25; // 25% recargo
+      } else if (v.color === 'reflectivo') {
+        factorColor = 1.40; // 40% recargo
+      }
+
+      costoItemVidrio += m2 * qty * precioBase * factorColor;
     });
     const m2VidrioTotal = m2VidrioItem * qty;
-    const precioVidrio = (item.categoria === 'cabina_baño') 
-                         ? (preciosConfig.vidrioTempladoCabinaM2 || 120000) 
-                         : preciosConfig.vidrioM2;
-    costoItemVidrio = m2VidrioTotal * precioVidrio;
 
     // 3. Accesorios (Kit diferenciado para cabinas y puertas)
     let kitsAccesoriosItem = 0;
@@ -147,6 +175,14 @@ function calcularPresupuesto(itemsVentanas, preciosConfig = PRECIOS_DEFECTO) {
     costoItemEmpaquetadura = metrosSelladorTotal * (preciosConfig.empaquetaduraMetro || 2500);
     const metrosEmpaquetaduraTotal = metrosSelladorTotal;
 
+    // Calcular peso total de vidrio del ítem
+    let pesoVidrioItem = 0;
+    item.vidrios.forEach(v => {
+      pesoVidrioItem += (v.pesoKg || 0);
+    });
+    const pesoVidrioTotal = pesoVidrioItem * qty;
+    totalPesoVidrio += pesoVidrioTotal;
+
     // Sumar a totales globales
     totalMetrosAluminio += metrosAluminioTotal;
     totalM2Vidrio += m2VidrioTotal;
@@ -174,6 +210,10 @@ function calcularPresupuesto(itemsVentanas, preciosConfig = PRECIOS_DEFECTO) {
       cantidad: qty,
       aluminioM: parseFloat(metrosAluminioTotal.toFixed(2)),
       vidrioM2: parseFloat(m2VidrioTotal.toFixed(2)),
+      pesoVidrioKg: parseFloat(pesoVidrioTotal.toFixed(2)),
+      tipoVidrio: item.tipoVidrio || 'monolitico',
+      espesorVidrio: item.espesorVidrio || '4',
+      colorVidrio: item.colorVidrio || 'claro',
       accesoriosCant: kitsAccesoriosTotal,
       selladoresM: parseFloat(metrosSelladorTotal.toFixed(2)),
       costoMateriales: parseFloat(subtotalItemMat.toFixed(2))
@@ -197,6 +237,7 @@ function calcularPresupuesto(itemsVentanas, preciosConfig = PRECIOS_DEFECTO) {
 
   return {
     detalles: desgloseDetallado,
+    totalPesoVidrio: parseFloat(totalPesoVidrio.toFixed(2)),
     materiales: {
       aluminio: { cant: parseFloat(totalMetrosAluminio.toFixed(2)), costo: parseFloat(costoAluminio.toFixed(2)) },
       vidrio: { cant: parseFloat(totalM2Vidrio.toFixed(2)), costo: parseFloat(costoVidrio.toFixed(2)) },

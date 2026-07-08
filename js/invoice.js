@@ -218,7 +218,7 @@ function renderizarFacturaPreview() {
     tr.innerHTML = `
       <td style="padding: 12px 5px;">
         <strong>${catLabel} (${d.tipo.toUpperCase()})</strong><br>
-        <span style="font-size: 11px; color: #64748b;">Medida: ${d.ancho}x${d.alto} mm | Ensamble 90°</span>
+        <span style="font-size: 11px; color: #64748b;">Medida: ${d.ancho}x${d.alto} mm | Vidrio: ${d.tipoVidrio.toUpperCase()} ${d.espesorVidrio}mm (${d.colorVidrio.toUpperCase()}) | Peso: ${d.pesoVidrioKg} kg</span>
       </td>
       <td style="padding: 12px 5px; text-align: center;">${d.cantidad}</td>
       <td style="padding: 12px 5px; text-align: right;">$${precioVentaUnitario.toLocaleString('es-CO')}</td>
@@ -380,7 +380,7 @@ function generarSiigoJSON() {
 
     const itemPayload = {
       code: 'VSTMDD', // Código de servicio genérico en catálogo Alumital (Visita/Servicio)
-      description: `${catLabel} ${d.tipo.toUpperCase()} ${d.ancho}x${d.alto} mm`,
+      description: `${catLabel} ${d.tipo.toUpperCase()} ${d.ancho}x${d.alto} mm (Vidrio: ${d.tipoVidrio.toUpperCase()} ${d.espesorVidrio}mm ${d.colorVidrio.toUpperCase()})`,
       quantity: d.cantidad,
       price: precioVentaUnitario,
       discount: 0,
