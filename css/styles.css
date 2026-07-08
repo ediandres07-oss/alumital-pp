@@ -380,11 +380,12 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   min-height: 360px;
-  background: radial-gradient(circle at center, rgba(16, 24, 48, 0.8) 0%, rgba(8, 12, 24, 0.95) 100%);
+  background: #ffffff;
   position: relative;
   overflow: hidden;
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .visualizer-svg-container {
