@@ -116,6 +116,22 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
 }
 
+.sidebar nav {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-grow: 1;
+  margin-bottom: 12px;
+}
+
+.sidebar nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
 .sidebar-menu {
   list-style: none;
   display: flex;
