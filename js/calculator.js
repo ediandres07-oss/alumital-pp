@@ -554,18 +554,19 @@ function calcularVentana(tipo, width, height, sistemaId = 'VC5020_90', categoria
   }
 
   // Enriquecer y calcular peso de los vidrios al final
-  const espesorNum = parseFloat(espesorVidrio) || 4;
+  const espesorStr = String(espesorVidrio || '4');
+  const espesorNum = parseFloat(espesorStr) || 4;
   vidrios.forEach(v => {
     v.tipo = tipoVidrio;
-    v.espesor = espesorVidrio;
+    v.espesor = espesorStr;
     v.color = colorVidrio;
 
     // Calcular espesor real del vidrio para el peso
     let espesorReal = espesorNum;
-    if (espesorVidrio.includes('+')) {
-      espesorReal = espesorVidrio.split('+').reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-    } else if (espesorVidrio.includes('-')) {
-      const parts = espesorVidrio.split('-');
+    if (espesorStr.includes('+')) {
+      espesorReal = espesorStr.split('+').reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+    } else if (espesorStr.includes('-')) {
+      const parts = espesorStr.split('-');
       espesorReal = parseFloat(parts[0]) + parseFloat(parts[parts.length - 1]);
     }
 
