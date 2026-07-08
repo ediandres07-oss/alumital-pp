@@ -5,28 +5,38 @@
 
 // Configuración de Sistemas de Perfiles del catálogo Alumina
 const SISTEMAS_PERFIL = {
-  'VC5020_90': {
-    nombre: 'Sistema VC5020 - 90° (Junta Recta)',
+  'S5020': {
+    nombre: 'Sistema 5020',
     ensamble: '90',
     marcoEspesor: 50,
     holguraHojaVertical: 32,
     traslapeHojaHorizontal: 16,
     descuentoVidrioAncho: 48,
     descuentoVidrioAlto: 48,
-    descuentoHojaHorizontal90: 52 // Descuento horizontal de la nave para el ensamble a 90°
+    descuentoHojaHorizontal90: 52
   },
-  'VP3831_45': {
-    nombre: 'Sistema VP3831 - 45° (Inglete)',
-    ensamble: '45',
-    marcoEspesor: 38,
-    holguraHojaVertical: 38,
-    traslapeHojaHorizontal: 10,
-    descuentoVidrioAncho: 60,
-    descuentoVidrioAlto: 60,
-    descuentoHojaHorizontal90: 0
+  'S5020_REF': {
+    nombre: 'Sistema 5020 Reforzado',
+    ensamble: '90',
+    marcoEspesor: 50,
+    holguraHojaVertical: 32,
+    traslapeHojaHorizontal: 16,
+    descuentoVidrioAncho: 48,
+    descuentoVidrioAlto: 48,
+    descuentoHojaHorizontal90: 52
   },
-  'PC8025_45': {
-    nombre: 'Sistema PC8025 - 45° (Inglete)',
+  'S744': {
+    nombre: 'Sistema 744',
+    ensamble: '90',
+    marcoEspesor: 74,
+    holguraHojaVertical: 40,
+    traslapeHojaHorizontal: 20,
+    descuentoVidrioAncho: 55,
+    descuentoVidrioAlto: 55,
+    descuentoHojaHorizontal90: 56
+  },
+  'S8025': {
+    nombre: 'Sistema 8025',
     ensamble: '45',
     marcoEspesor: 80,
     holguraHojaVertical: 60,
@@ -35,35 +45,25 @@ const SISTEMAS_PERFIL = {
     descuentoVidrioAlto: 60,
     descuentoHojaHorizontal90: 0
   },
-  'PC8025_90': {
-    nombre: 'Sistema PC8025 - 90° (Junta Recta)',
-    ensamble: '90',
-    marcoEspesor: 80,
-    holguraHojaVertical: 60,
-    traslapeHojaHorizontal: 20,
-    descuentoVidrioAncho: 60,
-    descuentoVidrioAlto: 60,
-    descuentoHojaHorizontal90: 54 // Descuento horizontal de la nave para ensamble recto
-  },
-  'PC7038_45': {
-    nombre: 'Sistema PC7038 - 45° (Inglete)',
-    ensamble: '45',
-    marcoEspesor: 70,
-    holguraHojaVertical: 70,
-    traslapeHojaHorizontal: 24,
-    descuentoVidrioAncho: 80,
-    descuentoVidrioAlto: 80,
-    descuentoHojaHorizontal90: 0
-  },
-  'PC7038_90': {
-    nombre: 'Sistema PC7038 - 90° (Junta Recta)',
+  'S7038_EXT': {
+    nombre: 'Sistema 7038 Exterior',
     ensamble: '90',
     marcoEspesor: 70,
     holguraHojaVertical: 70,
     traslapeHojaHorizontal: 24,
     descuentoVidrioAncho: 80,
     descuentoVidrioAlto: 80,
-    descuentoHojaHorizontal90: 76 // Descuento horizontal de la nave para ensamble recto
+    descuentoHojaHorizontal90: 58
+  },
+  'S7038_INT': {
+    nombre: 'Sistema 7038 Interior',
+    ensamble: '90',
+    marcoEspesor: 70,
+    holguraHojaVertical: 70,
+    traslapeHojaHorizontal: 24,
+    descuentoVidrioAncho: 80,
+    descuentoVidrioAlto: 80,
+    descuentoHojaHorizontal90: 58
   }
 };
 
@@ -270,7 +270,7 @@ function calcularVentana(tipo, width, height, sistemaId = 'VC5020_90', categoria
     return { perfiles, vidrios };
   }
 
-  const sys = SISTEMAS_PERFIL[sistemaId] || SISTEMAS_PERFIL['7030_45'];
+  const sys = SISTEMAS_PERFIL[sistemaId] || SISTEMAS_PERFIL['S5020'];
   const ensamble = sys.ensamble;
 
   if (tipo === 'corrediza' || tipo === 'corrediza3' || tipo === 'corrediza4') {

@@ -10,7 +10,7 @@ STATE.items = STATE.items || [];
 STATE.precios = { ...window.PRECIOS_DEFECTO, ...STATE.precios };
 STATE.activeTab = STATE.activeTab || 'configurador';
 STATE.currentCalculation = STATE.currentCalculation || null;
-STATE.sistemaPerfil = STATE.sistemaPerfil || 'PC7038_90';
+STATE.sistemaPerfil = STATE.sistemaPerfil || 'S5020';
 STATE.acabadoAluminio = STATE.acabadoAluminio || 'plata';
 
 // Cargar Skill Markdown para mostrar en la pestaña Claude
@@ -314,7 +314,7 @@ function dibujarSVG(tipo, width, height, targetSvgId = 'window-preview-svg', ite
   if (!svg) return;
 
   const stateContext = itemState || STATE;
-  const activeSys = window.SISTEMAS_PERFIL[stateContext.sistemaPerfil] || window.SISTEMAS_PERFIL['VC5020_90'];
+  const activeSys = window.SISTEMAS_PERFIL[stateContext.sistemaPerfil] || window.SISTEMAS_PERFIL['S5020'];
   const ensamble = activeSys.ensamble;
 
   // Limpiar e inyectar defs
