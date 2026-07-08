@@ -167,6 +167,28 @@ function initFormListeners() {
     });
   }
 
+  const selectEnsamble = document.getElementById('config-ensamble');
+  const selectTipo = document.getElementById('config-tipo');
+  if (selectEnsamble && selectTipo) {
+    selectEnsamble.addEventListener('change', () => {
+      const sys = selectEnsamble.value;
+      if (sys === 'S5020') {
+        selectTipo.value = 'corrediza4';
+      } else if (sys === 'S5020_REF') {
+        selectTipo.value = 'corrediza';
+      } else if (sys === 'S744') {
+        selectTipo.value = 'corrediza4';
+      } else if (sys === 'S8025') {
+        selectTipo.value = 'corrediza';
+      } else if (sys === 'S7038_EXT') {
+        selectTipo.value = 'corrediza3';
+      } else if (sys === 'S7038_INT') {
+        selectTipo.value = 'corrediza3';
+      }
+      actualizarCalculoConfigurador();
+    });
+  }
+
   const selectCategoria = document.getElementById('config-categoria');
   if (selectCategoria) {
     selectCategoria.addEventListener('change', () => {
@@ -336,6 +358,25 @@ function dibujarSVG(tipo, width, height, targetSvgId = 'window-preview-svg', ite
   const activeSys = window.SISTEMAS_PERFIL[stateContext.sistemaPerfil] || window.SISTEMAS_PERFIL['S5020'];
   const ensamble = activeSys.ensamble;
 
+  // Determinar la tipología de dibujo real basada en el sistema y la categoría
+  let tipoLayout = tipo;
+  const isVentanaOrPuerta = stateContext.categoria === 'ventana' || stateContext.categoria === 'puerta';
+  if (isVentanaOrPuerta) {
+    if (stateContext.sistemaPerfil === 'S5020') {
+      tipoLayout = 'corrediza4'; // O X X O
+    } else if (stateContext.sistemaPerfil === 'S5020_REF') {
+      tipoLayout = 'corrediza_reforzada'; // top XX, bottom OO
+    } else if (stateContext.sistemaPerfil === 'S744') {
+      tipoLayout = 'corrediza744'; // X X X O
+    } else if (stateContext.sistemaPerfil === 'S8025') {
+      tipoLayout = 'corrediza'; // X O
+    } else if (stateContext.sistemaPerfil === 'S7038_EXT') {
+      tipoLayout = 'corrediza3_ext'; // O X X
+    } else if (stateContext.sistemaPerfil === 'S7038_INT') {
+      tipoLayout = 'corrediza3_int'; // X O X
+    }
+  }
+
   // Limpiar e inyectar defs
   svg.innerHTML = '';
   crearDefinicionesSVG(svg);
@@ -387,7 +428,7 @@ function dibujarSVG(tipo, width, height, targetSvgId = 'window-preview-svg', ite
   } else {
     let codeTop, codeBottom, codeSides;
 
-    if (tipo === 'corrediza' || tipo === 'corrediza3' || tipo === 'corrediza4') {
+    if (tipoLayout.startsWith('corrediza') || tipoLayout === 'corrediza_reforzada' || tipoLayout === 'corrediza744' || tipoLayout === 'corrediza3_ext' || tipoLayout === 'corrediza3_int') {
       codeTop = 'MD-02'; // Dintel
       codeBottom = 'MU-01'; // Umbral
       codeSides = 'MJ-03'; // Jamba
@@ -424,151 +465,306 @@ function dibujarSVG(tipo, width, height, targetSvgId = 'window-preview-svg', ite
   // 2. Dibujar HOJAS y VIDRIO según Tipología
   const ST = 10; // Espesor de la hoja en px
 
-  if (tipo === 'fijo') {
+  if (tipoLayout === 'fijo') {
     // Paño fijo: Vidrio embutido en el marco directamente
     dibujarVidrioConBrillo(g, FT, FT, svgW - FT * 2, svgH - FT * 2);
   } 
-  else if (tipo === 'corrediza' || tipo === 'corrediza3' || tipo === 'corrediza4') {
-    if (tipo === 'corrediza4') {
-      // 4 Hojas corredizas: H1 (extrema izq, atrás), H2 (centro izq, adelante), H3 (centro der, adelante), H4 (extrema der, atrás)
-      const sashW = (svgW - 20) / 4 + 3; // Ancho con solape
-      const sashH = svgH - 20;
+  else if (tipoLayout === 'corrediza_reforzada') {
+    // top XX (sliding), bottom OO (fixed)
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const divH = 8;
+    const divY = svgH / 2 - divH / 2;
+    
+    // Perfil divisorio Horizontal
+    dibujarRectangulo(g, FT, divY, svgW - FT * 2, divH, fillMetal, strokeColor, 'svg-interactive-profile', 'PH-DIV');
+    
+    // Hojas superiores (2 corredizas)
+    const sashH_top = divY - 10;
+    const sashW_top = (svgW - 20) / 2 + 5;
+    const maxSlide_top = (svgW - 20) / 2 - 7;
+    const dx_top = (aperturaVal / 100) * maxSlide_top;
+    
+    // Hoja trasera (izquierda)
+    const gSash1_top = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash1_top);
+    dibujarEstructuraHoja(gSash1_top, 10, 10, sashW_top, sashH_top, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // Hoja delantera (derecha - desliza a la izquierda)
+    const gSash2_top = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash2_top.setAttribute('filter', 'url(#shadow)');
+    gSash2_top.setAttribute('transform', `translate(${-dx_top}, 0)`);
+    g.appendChild(gSash2_top);
+    dibujarEstructuraHoja(gSash2_top, svgW / 2 - 5, 10, sashW_top, sashH_top, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // Manija hoja superior
+    const handleY_top = sashH_top / 2 + 2;
+    dibujarRectangulo(gSash2_top, svgW / 2 - 1, handleY_top, 3, 10, '#cbd5e1', '#475569', 'manija', '');
+    
+    // Hojas inferiores (2 paños fijos "O O")
+    const sashH_bot = svgH - divY - divH - FT;
+    const sashW_bot = (svgW - FT * 2) / 2;
+    dibujarVidrioConBrillo(g, FT + 2, divY + divH + 2, sashW_bot - 4, sashH_bot - 4);
+    dibujarVidrioConBrillo(g, FT + sashW_bot + 2, divY + divH + 2, sashW_bot - 4, sashH_bot - 4);
+    
+    // Perfil divisorio vertical inferior
+    dibujarRectangulo(g, FT + sashW_bot - 4, divY + divH, 8, sashH_bot, fillMetal, strokeColor, 'svg-interactive-profile', 'PV-DIV');
+    
+    if (aperturaVal < 90) {
+      dibujarFlechaDeslizar(g, svgW - 35 - dx_top, 10 + sashH_top / 2, -12, '#ffffff');
+    }
+  }
+  else if (tipoLayout === 'corrediza744') {
+    // 4 Hojas: 3 corredizas, 1 fija (X X X O)
+    const sashW = (svgW - 20) / 4 + 3;
+    const sashH = svgH - 20;
+    const maxSlide = sashW - 14;
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const dx = (aperturaVal / 100) * maxSlide;
+    
+    // H4 (Derecha fija - O)
+    const gSash4 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash4);
+    dibujarEstructuraHoja(gSash4, 10 + sashW * 3 - 9, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // H1, H2, H3 (Corredizas - X X X, deslizan a la derecha)
+    const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash1.setAttribute('transform', `translate(${dx}, 0)`);
+    g.appendChild(gSash1);
+    dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash2.setAttribute('transform', `translate(${dx}, 0)`);
+    gSash2.setAttribute('filter', 'url(#shadow)');
+    g.appendChild(gSash2);
+    dibujarEstructuraHoja(gSash2, 10 + sashW - 3, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash3.setAttribute('transform', `translate(${dx}, 0)`);
+    gSash3.setAttribute('filter', 'url(#shadow)');
+    g.appendChild(gSash3);
+    dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 6, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // Manija en H3
+    const isPuerta = stateContext.categoria === 'puerta';
+    const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
+    dibujarRectangulo(gSash3, 10 + sashW * 2.5, handleY, 3, 16, '#cbd5e1', '#475569', 'manija', '');
+    
+    if (aperturaVal < 90) {
+      dibujarFlechaDeslizar(g, 10 + sashW * 1.5 + dx, svgH / 2 + 10, 10, '#ffffff');
+    }
+  }
+  else if (tipoLayout === 'corrediza3_ext') {
+    // 3 Hojas: O X X (izq fija, centro/der corredizas)
+    const sashW = (svgW - 20) / 3 + 2;
+    const sashH = svgH - 20;
+    const maxSlide = sashW - 14;
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const dx = (aperturaVal / 100) * maxSlide;
+    
+    // H1 (Izquierda fija - O)
+    const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash1);
+    dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // H2, H3 (Corredizas - X X, deslizan a la izquierda)
+    const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
+    gSash2.setAttribute('filter', 'url(#shadow)');
+    g.appendChild(gSash2);
+    dibujarEstructuraHoja(gSash2, 10 + sashW - 2, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash3.setAttribute('transform', `translate(${-dx}, 0)`);
+    gSash3.setAttribute('filter', 'url(#shadow)');
+    g.appendChild(gSash3);
+    dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 4, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // Manija en H3
+    const isPuerta = stateContext.categoria === 'puerta';
+    const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
+    dibujarRectangulo(gSash3, 10 + sashW * 2.5, handleY, 3, 16, '#cbd5e1', '#475569', 'manija', '');
+    
+    if (aperturaVal < 90) {
+      dibujarFlechaDeslizar(g, 10 + sashW * 2 - dx, svgH / 2 + 10, -10, '#ffffff');
+    }
+  }
+  else if (tipoLayout === 'corrediza3_int') {
+    // 3 Hojas: X O X (centro fija, laterales corredizas)
+    const sashW = (svgW - 20) / 3 + 2;
+    const sashH = svgH - 20;
+    const maxSlide = sashW - 14;
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const dx = (aperturaVal / 100) * maxSlide;
+    
+    // H2 (Centro fija - O)
+    const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash2);
+    dibujarEstructuraHoja(gSash2, 10 + sashW - 2, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // H1 (Izquierda corrediza - X, desliza a la derecha)
+    const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash1.setAttribute('transform', `translate(${dx}, 0)`);
+    gSash1.setAttribute('filter', 'url(#shadow)');
+    g.appendChild(gSash1);
+    dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // H3 (Derecha corrediza - X, desliza a la izquierda)
+    const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash3.setAttribute('transform', `translate(${-dx}, 0)`);
+    gSash3.setAttribute('filter', 'url(#shadow)');
+    g.appendChild(gSash3);
+    dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 4, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // Manija en H1 y H3
+    const isPuerta = stateContext.categoria === 'puerta';
+    const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
+    dibujarRectangulo(gSash1, 10 + sashW - 6, handleY, 3, 16, '#cbd5e1', '#475569', 'manija', '');
+    dibujarRectangulo(gSash3, 10 + sashW * 2 - 2, handleY, 3, 16, '#cbd5e1', '#475569', 'manija', '');
+    
+    if (aperturaVal < 90) {
+      dibujarFlechaDeslizar(g, 10 + sashW * 0.5 + dx, svgH / 2 + 10, 10, '#ffffff');
+      dibujarFlechaDeslizar(g, 10 + sashW * 2.5 - dx, svgH / 2 + 10, -10, '#ffffff');
+    }
+  }
+  else if (tipoLayout === 'corrediza4') {
+    // 4 Hojas corredizas: H1 (extrema izq, atrás), H2 (centro izq, adelante), H3 (centro der, adelante), H4 (extrema der, atrás)
+    const sashW = (svgW - 20) / 4 + 3; // Ancho con solape
+    const sashH = svgH - 20;
 
-      // Cada hoja central desliza hacia los lados superponiéndose con su respectiva hoja lateral fija
-      const maxSlide = sashW - 14;
-      const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
-      const dx = (aperturaVal / 100) * maxSlide;
+    // Cada hoja central desliza hacia los lados superponiéndose con su respectiva hoja lateral fija
+    const maxSlide = sashW - 14;
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const dx = (aperturaVal / 100) * maxSlide;
 
-      // H1 (Extremo izquierdo - atrás/fija)
-      const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.appendChild(gSash1);
-      dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    // H1 (Extremo izquierdo - atrás/fija)
+    const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash1);
+    dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
 
-      // H4 (Extremo derecho - atrás/fija)
-      const gSash4 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.appendChild(gSash4);
-      dibujarEstructuraHoja(gSash4, 10 + sashW * 3 - 9, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    // H4 (Extremo derecho - atrás/fija)
+    const gSash4 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash4);
+    dibujarEstructuraHoja(gSash4, 10 + sashW * 3 - 9, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
 
-      // H2 (Centro-izquierda - adelante, desliza a la izquierda)
-      const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      gSash2.setAttribute('filter', 'url(#shadow)');
-      gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
-      g.appendChild(gSash2);
-      dibujarEstructuraHoja(gSash2, 10 + sashW - 3, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
-      // Manija H2 (central)
-      const isPuerta3 = stateContext.categoria === 'puerta';
-      const isBañoSoloVidrioHandle3 = stateContext.categoria === 'cabina_baño' && stateContext.estiloCabina === 'solo_vidrio';
-      const handleY = isPuerta3 ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
-      const handleH = isPuerta3 ? 32 : 16;
-      const handleW = isPuerta3 ? 4.5 : 3;
-      if (isBañoSoloVidrioHandle3) {
-        dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 3.5, '#cbd5e1', '#475569');
-        dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 1.5, '#f8fafc', '#334155');
-      } else {
-        dibujarRectangulo(gSash2, 10 + sashW * 2 - (isPuerta3 ? 6.5 : 5), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
-      }
-
-      // H3 (Centro-derecha - adelante, desliza a la derecha)
-      const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      gSash3.setAttribute('filter', 'url(#shadow)');
-      gSash3.setAttribute('transform', `translate(${dx}, 0)`);
-      g.appendChild(gSash3);
-      dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 6, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
-      // Manija H3
-      if (isBañoSoloVidrioHandle3) {
-        dibujarCirculo(gSash3, 10 + sashW * 2 - 6, handleY + 8, 3.5, '#cbd5e1', '#475569');
-        dibujarCirculo(gSash3, 10 + sashW * 2 - 6, handleY + 8, 1.5, '#f8fafc', '#334155');
-      } else {
-        dibujarRectangulo(gSash3, 10 + sashW * 2 - (isPuerta3 ? 4.5 : 3), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
-      }
-
-      // Flechas indicadoras de deslizamiento
-      if (aperturaVal < 90) {
-        dibujarFlechaDeslizar(g, 10 + sashW * 1.5 - dx, svgH / 2 + 10, -10, '#ffffff');
-        dibujarFlechaDeslizar(g, 10 + sashW * 2.5 + dx, svgH / 2 + 10, 10, '#ffffff');
-      }
-    } else if (tipo === 'corrediza3') {
-      // 3 Hojas corredizas: H1 (extrema izq, atrás), H2 (central, adelante), H3 (extrema der, atrás)
-      const sashW = (svgW - 20) / 3 + 2; // Ancho con solape
-      const sashH = svgH - 20;
-
-      // La hoja del medio se desliza hacia la izquierda superponiéndose con H1
-      const maxSlide = sashW - 14;
-      const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
-      const dx = (aperturaVal / 100) * maxSlide;
-
-      // H1 (Extremo izquierdo - atrás/fija)
-      const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.appendChild(gSash1);
-      dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
-
-      // H3 (Extremo derecho - atrás/fija)
-      const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.appendChild(gSash3);
-      dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 4, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
-
-      // H2 (Hoja central - adelante, desliza a la izquierda)
-      const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      gSash2.setAttribute('filter', 'url(#shadow)');
-      gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
-      g.appendChild(gSash2);
-      dibujarEstructuraHoja(gSash2, 10 + sashW - 2, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
-      
-      // Manija interior hoja movil (derecha)
-      const isPuerta = stateContext.categoria === 'puerta';
-      const isBañoSoloVidrioHandle = stateContext.categoria === 'cabina_baño' && stateContext.estiloCabina === 'solo_vidrio';
-      const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
-      const handleH = isPuerta ? 32 : 16;
-      const handleW = isPuerta ? 4.5 : 3;
-      
-      if (isBañoSoloVidrioHandle) {
-        dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 3.5, '#cbd5e1', '#475569');
-        dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 1.5, '#f8fafc', '#334155');
-      } else {
-        dibujarRectangulo(gSash2, 10 + sashW * 2 - (isPuerta ? 4.5 : 3), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
-      }
-
-      // Flecha de deslizamiento
-      if (aperturaVal < 90) {
-        const arrowY = svgH / 2 + 10;
-        dibujarFlechaDeslizar(g, 10 + sashW * 1.5 - dx, arrowY, -10, '#ffffff');
-      }
+    // H2 (Centro-izquierda - adelante, desliza a la izquierda)
+    const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash2.setAttribute('filter', 'url(#shadow)');
+    gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
+    g.appendChild(gSash2);
+    dibujarEstructuraHoja(gSash2, 10 + sashW - 3, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    // Manija H2 (central)
+    const isPuerta3 = stateContext.categoria === 'puerta';
+    const isBañoSoloVidrioHandle3 = stateContext.categoria === 'cabina_baño' && stateContext.estiloCabina === 'solo_vidrio';
+    const handleY = isPuerta3 ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
+    const handleH = isPuerta3 ? 32 : 16;
+    const handleW = isPuerta3 ? 4.5 : 3;
+    if (isBañoSoloVidrioHandle3) {
+      dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 3.5, '#cbd5e1', '#475569');
+      dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 1.5, '#f8fafc', '#334155');
     } else {
-      // Ventana corrediza estándar de 2 hojas
-      const sashW = (svgW - 20) / 2 + 5;
-      const sashH = svgH - 20;
-      
-      const maxSlide = (svgW - 20) / 2 - 7;
-      const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
-      const dx = (aperturaVal / 100) * maxSlide;
+      dibujarRectangulo(gSash2, 10 + sashW * 2 - (isPuerta3 ? 6.5 : 5), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
+    }
 
-      const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.appendChild(gSash1);
-      dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    // H3 (Centro-derecha - adelante, desliza a la derecha)
+    const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash3.setAttribute('filter', 'url(#shadow)');
+    gSash3.setAttribute('transform', `translate(${dx}, 0)`);
+    g.appendChild(gSash3);
+    dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 6, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    // Manija H3
+    if (isBañoSoloVidrioHandle3) {
+      dibujarCirculo(gSash3, 10 + sashW * 2 - 6, handleY + 8, 3.5, '#cbd5e1', '#475569');
+      dibujarCirculo(gSash3, 10 + sashW * 2 - 6, handleY + 8, 1.5, '#f8fafc', '#334155');
+    } else {
+      dibujarRectangulo(gSash3, 10 + sashW * 2 - (isPuerta3 ? 4.5 : 3), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
+    }
 
-      const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      gSash2.setAttribute('filter', 'url(#shadow)');
-      gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
-      g.appendChild(gSash2);
-      
-      dibujarEstructuraHoja(gSash2, svgW / 2 - 5, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
-      
-      const isPuerta = STATE.currentCalculation && STATE.currentCalculation.categoria === 'puerta';
-      const isBañoSoloVidrio = STATE.currentCalculation && STATE.currentCalculation.categoria === 'cabina_baño' && STATE.currentCalculation.estiloCabina === 'solo_vidrio';
-      const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
-      const handleH = isPuerta ? 32 : 16;
-      const handleW = isPuerta ? 4.5 : 4;
-      if (isBañoSoloVidrio) {
-        dibujarCirculo(gSash2, svgW / 2 - 3, handleY + 8, 3.5, '#cbd5e1', '#475569');
-        dibujarCirculo(gSash2, svgW / 2 - 3, handleY + 8, 1.5, '#f8fafc', '#334155');
-      } else {
-        dibujarRectangulo(gSash2, svgW / 2 - (isPuerta ? 1.5 : 1), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
-      }
+    // Flechas indicadoras de deslizamiento
+    if (aperturaVal < 90) {
+      dibujarFlechaDeslizar(g, 10 + sashW * 1.5 - dx, svgH / 2 + 10, -10, '#ffffff');
+      dibujarFlechaDeslizar(g, 10 + sashW * 2.5 + dx, svgH / 2 + 10, 10, '#ffffff');
+    }
+  } else if (tipoLayout === 'corrediza3') {
+    // 3 Hojas corredizas: H1 (extrema izq, atrás), H2 (central, adelante), H3 (extrema der, atrás)
+    const sashW = (svgW - 20) / 3 + 2; // Ancho con solape
+    const sashH = svgH - 20;
 
-      if (STATE.aperturaPorcentaje < 90) {
-        const arrowY = svgH / 2 + 10;
-        dibujarFlechaDeslizar(g, svgW - 35 - dx, arrowY, -12, '#ffffff');
-      }
+    // La hoja del medio se desliza hacia la izquierda superponiéndose con H1
+    const maxSlide = sashW - 14;
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const dx = (aperturaVal / 100) * maxSlide;
+
+    // H1 (Extremo izquierdo - atrás/fija)
+    const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash1);
+    dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+
+    // H3 (Extremo derecho - atrás/fija)
+    const gSash3 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash3);
+    dibujarEstructuraHoja(gSash3, 10 + sashW * 2 - 4, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+
+    // H2 (Hoja central - adelante, desliza a la izquierda)
+    const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash2.setAttribute('filter', 'url(#shadow)');
+    gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
+    g.appendChild(gSash2);
+    dibujarEstructuraHoja(gSash2, 10 + sashW - 2, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    // Manija interior hoja movil (derecha)
+    const isPuerta = stateContext.categoria === 'puerta';
+    const isBañoSoloVidrioHandle = stateContext.categoria === 'cabina_baño' && stateContext.estiloCabina === 'solo_vidrio';
+    const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
+    const handleH = isPuerta ? 32 : 16;
+    const handleW = isPuerta ? 4.5 : 3;
+    
+    if (isBañoSoloVidrioHandle) {
+      dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 3.5, '#cbd5e1', '#475569');
+      dibujarCirculo(gSash2, 10 + sashW * 2 - 8, handleY + 8, 1.5, '#f8fafc', '#334155');
+    } else {
+      dibujarRectangulo(gSash2, 10 + sashW * 2 - (isPuerta ? 4.5 : 3), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
+    }
+
+    // Flecha de deslizamiento
+    if (aperturaVal < 90) {
+      const arrowY = svgH / 2 + 10;
+      dibujarFlechaDeslizar(g, 10 + sashW * 1.5 - dx, arrowY, -10, '#ffffff');
+    }
+  } else {
+    // Ventana corrediza estándar de 2 hojas (X O)
+    const sashW = (svgW - 20) / 2 + 5;
+    const sashH = svgH - 20;
+    
+    const maxSlide = (svgW - 20) / 2 - 7;
+    const aperturaVal = typeof stateContext.aperturaPorcentaje === 'number' ? stateContext.aperturaPorcentaje : (STATE.aperturaPorcentaje || 0);
+    const dx = (aperturaVal / 100) * maxSlide;
+
+    const gSash1 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.appendChild(gSash1);
+    dibujarEstructuraHoja(gSash1, 10, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+
+    const gSash2 = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gSash2.setAttribute('filter', 'url(#shadow)');
+    gSash2.setAttribute('transform', `translate(${-dx}, 0)`);
+    g.appendChild(gSash2);
+    
+    dibujarEstructuraHoja(gSash2, svgW / 2 - 5, 10, sashW, sashH, ST, ensamble, 'HJ-04', 'HC-06', 'HZ-05', fillMetal, strokeColor);
+    
+    const isPuerta = STATE.currentCalculation && STATE.currentCalculation.categoria === 'puerta';
+    const isBañoSoloVidrio = STATE.currentCalculation && STATE.currentCalculation.categoria === 'cabina_baño' && STATE.currentCalculation.estiloCabina === 'solo_vidrio';
+    const handleY = isPuerta ? (sashH - (sashH * 0.45)) : (sashH / 2 + 2);
+    const handleH = isPuerta ? 32 : 16;
+    const handleW = isPuerta ? 4.5 : 4;
+    if (isBañoSoloVidrio) {
+      dibujarCirculo(gSash2, svgW / 2 - 3, handleY + 8, 3.5, '#cbd5e1', '#475569');
+      dibujarCirculo(gSash2, svgW / 2 - 3, handleY + 8, 1.5, '#f8fafc', '#334155');
+    } else {
+      dibujarRectangulo(gSash2, svgW / 2 - (isPuerta ? 1.5 : 1), handleY, handleW, handleH, '#cbd5e1', '#475569', 'manija', '');
+    }
+
+    if (aperturaVal < 90) {
+      const arrowY = svgH / 2 + 10;
+      dibujarFlechaDeslizar(g, svgW - 35 - dx, arrowY, -12, '#ffffff');
     }
   } 
   else if (tipo === 'abatible') {
