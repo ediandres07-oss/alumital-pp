@@ -7,7 +7,7 @@
 window.STATE = window.STATE || {};
 const STATE = window.STATE;
 STATE.items = STATE.items || [];
-STATE.precios = STATE.precios || { ...window.PRECIOS_DEFECTO };
+STATE.precios = { ...window.PRECIOS_DEFECTO, ...STATE.precios };
 STATE.activeTab = STATE.activeTab || 'configurador';
 STATE.currentCalculation = STATE.currentCalculation || null;
 STATE.sistemaPerfil = STATE.sistemaPerfil || 'PC7038_90';
@@ -98,6 +98,12 @@ function initNavigation() {
         if (typeof cargarHistorial === 'function') cargarHistorial();
         if (typeof cargarClientesDropdown === 'function') cargarClientesDropdown();
       }
+
+      // Cerrar menú móvil si está abierto
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar) sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
     });
   });
 }

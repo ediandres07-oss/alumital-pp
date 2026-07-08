@@ -158,7 +158,8 @@
           STATE.items = typeof cot.items_json === 'string' ? JSON.parse(cot.items_json) : cot.items_json;
         }
         if (cot.precios_json) {
-          STATE.precios = typeof cot.precios_json === 'string' ? JSON.parse(cot.precios_json) : cot.precios_json;
+          const parsed = typeof cot.precios_json === 'string' ? JSON.parse(cot.precios_json) : cot.precios_json;
+          STATE.precios = { ...window.PRECIOS_DEFECTO, ...parsed };
         }
       }
 
